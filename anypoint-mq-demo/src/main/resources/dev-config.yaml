@@ -1,0 +1,4 @@
+mq:
+  url: "https://mq-us-east-1.anypoint.mulesoft.com/api/v1"
+  clientId: "xxxxxxxxx"
+  clientSecret: "xxxxxxxxx"

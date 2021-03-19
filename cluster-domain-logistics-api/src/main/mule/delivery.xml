@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+  <flow name="api-2Flow" doc:id="f2db11d7-f72d-4af7-b92c-8e5b6805ae47" >
+    <vm:listener queueName="orderQueue" doc:name="Listener" doc:id="59799f98-3855-4f64-a1dc-8163aadf634b" config-ref="clusterVMConfig"/>
+    <logger level="INFO" doc:name="Logger" doc:id="e2aed521-4d7f-45e8-a8ad-644ef62c6b72" message="#[{&#10;	despatched : payload&#10;}]"/>
+  </flow>
+</mule>

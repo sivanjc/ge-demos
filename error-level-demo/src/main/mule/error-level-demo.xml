@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+  xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+  xmlns:custom-metrics="http://www.mulesoft.org/schema/mule/custom-metrics" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+  xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/custom-metrics http://www.mulesoft.org/schema/mule/custom-metrics/current/mule-custom-metrics.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+  <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="253995bd-88fb-417c-9c58-4c3022ecec91">
+    <http:listener-connection host="0.0.0.0" port="8081" />
+  </http:listener-config>
+  <cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="6a6876ad-dfea-4284-96e6-03ead32e311f">
+    <cloudhub:connection username="${cloudhub.username}" password="${cloudhub.password}" environment="6a5e5868-cfc6-4d10-8e79-c9d8fb37e48b">
+      <reconnection />
+    </cloudhub:connection>
+  </cloudhub:config>
+  <configuration-properties doc:name="Configuration properties" doc:id="44953296-3d6b-4d96-ad9d-8627ef268c44" file="demo.yaml" />
+  <json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="b6ba4470-2718-40ff-b2d8-6a25bc88f583" environment="Sandbox" applicationName="Test Application" applicationVersion="1.0"/>
+  <flow name="normal-flow" doc:id="f73a6593-38cf-4db8-a060-19f69e178928">
+    <http:listener doc:name='get /logs' doc:id="b55f96f8-4809-4790-baf7-e30395a375dd" path="/logs" config-ref="HTTP_Listener_config" />
+    <json-logger:logger doc:name="Logger" doc:id="827ebc7d-3aa3-43e6-93c0-51ab40a91a00" config-ref="JSON_Logger_Config" message="Hello">
+      <json-logger:content ><![CDATA[#[%dw 2.0
+import modules::JSONLoggerModule 
+output application/json 
+---
+{
+    payload: JSONLoggerModule::stringifyNonJSON(payload),
+    start :  now()
+}]]]></json-logger:content>
+    </json-logger:logger>
+    <logger level="INFO" doc:name="Entry Logger" doc:id="65a47eae-2599-4d7e-8e8e-cf4b9b74db11" category="Flow.Entry.Loggger" message='#[{ "Flow Started" : now() }]' />
+    <logger level="DEBUG" doc:name="debug-logger" doc:id="ee540dbf-e127-41e9-8995-da1cb05ff0c1" message="sizeOf(payload)" category="debug-logger" />
+    <logger level="ERROR" doc:name="error-logger" doc:id="910bc4f1-806c-4939-ab52-87ac7a482a04" message="Logger at Error Level" category="error-logger" />
+    <logger level="INFO" doc:name="info-logger" doc:id="9beb1500-8224-448a-a95b-3f42602cc8de" message="info-logger" category="info-logger" />
+    <logger level="INFO" doc:name="Trace-logger" doc:id="c43638e4-eb00-4bde-a51e-72f90759e72e" message="Logger at trace level" category="Trace-logger" />
+    <ee:transform doc:name="dataweave logging example" doc:id="57b25b86-f304-4208-abd2-5d2e09434ee2">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+	somelogs : log("Hello world log from dataweave")
+	
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <tracking:custom-event doc:name="Custom Business Event" doc:id="1e6151e5-3023-4b7a-8f2e-f8538860fc3e" event-name="OrderTotal">
+      <tracking:meta-data key="totalOrdersPerBatch" value="100" />
+      <tracking:meta-data key="totalRevenuePerBatch" value="5000" />
+      <tracking:meta-data key="totalWebBasedOrders" value="50" />
+    </tracking:custom-event>
+    <cloudhub:create-notification doc:name="Create Notification" doc:id="d7f3fbad-991b-469e-adcc-ea0ea15ea31b" config-ref="CloudHub_Config"
+      priority="ERROR" domain="acme-retail-database-sapi-siva">
+      <cloudhub:message><![CDATA[Hello world notification from Cloudhub Connector. Testing.. Notifications..]]></cloudhub:message>
+    </cloudhub:create-notification>
+    <logger level="WARN" doc:name="warn-logger" doc:id="2075cfbf-092e-42a4-a9c1-d25742a51487" message="Logger at warn Level" category="warn-logger" />
+    <custom-metrics:send doc:name="Send Custom Metric" doc:id="40f1fb6b-15f8-47f5-b2d7-faf065ba4fdf" metricName="myMetrics">
+      <custom-metrics:dimensions>
+        <custom-metrics:dimension dimensionName="hello" value="#[99]" />
+      </custom-metrics:dimensions>
+      <custom-metrics:facts>
+        <custom-metrics:fact factName="orders" value="#[55.55]" />
+      </custom-metrics:facts>
+    </custom-metrics:send>
+    <json-logger:logger doc:name="Logger" doc:id="b1407dca-8a56-4c92-85c7-112739ca8b9e" config-ref="JSON_Logger_Config" tracePoint="END" message="Hello">
+      <json-logger:content ><![CDATA[#[%dw 2.0
+import modules::JSONLoggerModule 
+output application/json 
+---
+{
+    payload: JSONLoggerModule::stringifyNonJSON(payload),
+    end :  now() 
+}]]]></json-logger:content>
+    </json-logger:logger>
+  </flow>
+
+  <flow name="error-flow" doc:id="c5d9ad9c-ea43-4fa5-978f-648041280b49" tracking:enable-default-events="true">
+    <http:listener doc:name='get /error' doc:id="40d63677-818a-4e1b-b37c-f6b80564a61b" path="/error" config-ref="HTTP_Listener_config" />
+    <json-logger:logger doc:name="Logger" doc:id="272cad5c-e768-492b-b2ac-62f7f7175b6f" config-ref="JSON_Logger_Config" message="Hello" category="error-flow">
+      <json-logger:content><![CDATA[#[%dw 2.0
+import modules::JSONLoggerModule 
+output application/json 
+---
+{
+    payload: JSONLoggerModule::stringifyNonJSON(payload),
+    start :  now()
+}]]]></json-logger:content>
+    </json-logger:logger>
+    <logger level="DEBUG" doc:name="info-logger" doc:id="371ca504-25a4-4815-946d-b7427bee1bef" message="info-logger" category="info-logger" />
+    <raise-error doc:name="Raise error" doc:id="db799512-cdbc-46e7-8d6d-d9a1135fe0ed" type="CUSTOM:ERROR"/>
+    <json-logger:logger doc:name="Logger" doc:id="91992da8-dadd-4983-80d2-b6c9939d12ef" config-ref="JSON_Logger_Config" tracePoint="END" message="Hello" category="error-flow">
+      <json-logger:content><![CDATA[#[%dw 2.0
+import modules::JSONLoggerModule 
+output application/json 
+---
+{
+    payload: JSONLoggerModule::stringifyNonJSON(payload),
+    end :  now() 
+}]]]></json-logger:content>
+    </json-logger:logger>
+    <error-handler >
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="212c7911-1654-4362-b351-3215a057fa28" type="ANY">
+        <cloudhub:create-notification doc:name="Create Notification" doc:id="00550caa-7a8e-4533-82c6-7bd3cdee256c" config-ref="CloudHub_Config" priority="ERROR" domain="acme-retail-database-sapi-siva">
+      <cloudhub:message><![CDATA[Hello world notification from Cloudhub Connector. Testing.. Notifications..]]></cloudhub:message>
+    </cloudhub:create-notification>
+      </on-error-propagate>
+    </error-handler>
+  </flow>
+	<flow name="error-level-demoFlow" doc:id="86c2a996-039c-489d-bdc9-8f39ee9390fd" >
+    <http:listener doc:name="/ping" doc:id="90934ffe-ca9a-4990-a8cf-189bdcc63c53" config-ref="HTTP_Listener_config" path="/ping"/>
+    <set-payload value="pong" doc:name="Set Payload" doc:id="2d071a55-20ce-4708-980a-db4ea75a3c26" />
+  </flow>
+  <flow name="ping-pong-flow" doc:id="cbc989a5-3eec-42b4-972e-b9bdf967565a" >
+		<http:listener doc:name="Listener" doc:id="d7c05895-7d0c-431a-8db3-5e3edcf0e2dd" config-ref="HTTP_Listener_config" path="/ping"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="bf8d4bcf-ab6f-4ad9-a2ae-16a54060eff4" >
+			<route >
+				<flow-ref doc:name="check database" doc:id="92a0300e-edde-4597-b068-c125e99c8285" />
+			</route>
+			<route >
+				<flow-ref doc:name="check rest api" doc:id="cd714690-48e0-437e-a0bb-b9e4dad07142" />
+			</route>
+			<route >
+				<flow-ref doc:name="check mainframe" doc:id="0acdd1d0-2f39-4e5a-ab19-688e7a341ac5" />
+			</route>
+		</scatter-gather>
+		<validation:is-false doc:id="f791b6e3-22a0-4b84-80aa-5199b82a3274" />
+	</flow>
+</mule>

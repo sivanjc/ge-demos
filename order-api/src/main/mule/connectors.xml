@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+  <flow name="connectorsFlow" doc:id="05a46b3e-283d-4447-9bd3-4427147a9423" >
+    <wsc:consume doc:name="Consume" doc:id="db22ad52-e773-4589-8486-1811c43707b2" />
+  </flow>
+  <flow name="connectorsFlow1" doc:id="a3fc47ec-1d39-4427-b741-39c304e66414" >
+    <db:listener doc:name="On Table Row" doc:id="4945bd9c-6370-441f-b69b-8d4fcb4d2b17" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </db:listener>
+  </flow>
+  <flow name="connectorsFlow2" doc:id="f54abac0-eef4-481c-916d-f7e8eb7537a7" >
+    <file:listener doc:name="On New or Updated File" doc:id="7a5e60ec-ca4f-406c-aeb6-8880f8f93463" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </file:listener>
+  </flow>
+  <flow name="connectorsFlow3" doc:id="2481e037-1501-4690-845f-d62d2afdcc6a" >
+    <scheduler doc:name="Scheduler" doc:id="73c77583-66a4-4a4b-bf99-427c231f3f53" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </scheduler>
+    <os:store doc:id="b4fd312a-11db-44ed-9779-759ab7d3e65c" />
+  </flow>
+</mule>

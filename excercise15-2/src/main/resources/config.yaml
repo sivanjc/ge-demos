@@ -1,0 +1,28 @@
+###
+# #%L
+# MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+# %%
+# Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+# %%
+# The software in this package is published under the terms of the
+# Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+# a copy of which has been included with this distribution in the LICENSE.txt file.
+# #L%
+###
+http:
+  port: "8081"
+db:
+  host: "localhost"
+  port: "3306"
+  user: "root"
+  url: "training?useUnicode=true&useJDBCCompliantTimezoneShift
+  =true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false"
+  password: "password"
+file:
+  securefile: "config-http.yaml"
+
+  
+  
+  
+  
+  

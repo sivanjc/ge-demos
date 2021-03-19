@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:cluster="http://www.mulesoft.org/schema/mule/ee/cluster" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+  <os:object-store name="Object_store" doc:name="Object store" doc:id="b5e0265e-f261-403e-a8cd-d0083af4cf9b" persistent="false"/>
+  <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="1791722c-a1a2-4148-8def-65dc4305cc58" />
+  <os:object-store name="myPersonalObjectStore" doc:name="Object store" doc:id="adf3dcb7-dab0-4a80-8dcd-0a04bdf9cd3e" config-ref="ObjectStore_Config" />
+
+  <flow name="state-managementFlow" doc:id="473613fc-ea8d-438b-a9af-e82bfd662dcb" >
+    <http:listener doc:name="Listener" doc:id="801e3f70-ac74-4568-9e57-03ddd548ca7c" />
+    <os:retrieve doc:name="Retrieve" doc:id="04971cc3-9385-476f-8f35-bb5f0f871c23" objectStore="Object_store"/>
+    <set-variable value="100" doc:name="x" doc:id="671809ea-6ec2-432b-a758-c5d5a5dd16b0" variableName="x"/>
+    <set-payload value="#[payload]" doc:name="y" doc:id="e5ca3d10-163d-454f-89be-a6c503c5726c" />
+    <foreach doc:name="For Each" doc:id="8f13df09-5038-4408-a966-e720831d2a66" />
+    <scatter-gather doc:name="Scatter-Gather" doc:id="b1057723-9b04-4726-8268-52189d6152c8" />
+    <http:request method="GET" doc:name="Request" doc:id="e7a055b0-eb4e-4ab3-8485-33dd62c3b535" />
+    <logger level="INFO" doc:name="Logger" doc:id="9a1d41f8-a411-456d-897d-a3cf0b96d023" />
+    <os:store doc:id="98f397c0-21ad-4803-b230-37bb152fdbae" />
+  </flow>
+</mule>

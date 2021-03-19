@@ -1,0 +1,258 @@
+form: COPYBOOK
+id: 'RCB-RECORD'
+values: 
+- name: 'RCB-KEY'
+  maxLength: 10
+  values: 
+  - { name: 'RCB-DIVISION', type: String, length: 2 }
+  - { name: 'RCB-CUSTOMER-CODE', type: String, length: 8 }
+- name: 'RCB-DETAILS'
+  maxLength: 1370
+  values: 
+  - { name: 'RCB-CUSTOMER-NAME', type: String, length: 40 }
+  - { name: 'RCB-ADDRESS-LINE-1', type: String, length: 30 }
+  - { name: 'RCB-ADDRESS-LINE-2', type: String, length: 30 }
+  - { name: 'RCB-ADDRESS-LINE-3', type: String, length: 30 }
+  - { name: 'RCB-POSTCODE', type: String, length: 6 }
+  - { name: 'RCB-TELEPHONE', type: String, length: 25 }
+  - { name: 'RCB-FAX', type: String, length: 24 }
+  - { name: 'RCB-FAX-STREAM', type: String, length: 1 }
+  - { name: 'RCB-CONTACT', type: String, length: 30 }
+  - name: 'RCB-ALT-KEY-2'
+    maxLength: 10
+    values: 
+    - { name: 'RCB-DIVISION-ALT-2', type: String, length: 2 }
+    - { name: 'RCB-DEBTOR-CODE', type: String, length: 8 }
+  - { name: 'RCB-CUSTOMER-SALES-GROUP-A', type: String, length: 3 }
+  - { name: 'RCB-CUSTOMER-SALES-GROUP-B', type: String, length: 3 }
+  - { name: 'RCB-CUSTOMER-SALES-GROUP-C', type: String, length: 3 }
+  - { name: 'RCB-CUSTOMER-PRICING-GROUP', type: String, length: 5 }
+  - { name: 'RCB-BUYING-GROUP', type: String, length: 6 }
+  - { name: 'RCB-SALES-BY-PRODUCT', type: String, length: 1 }
+  - { name: 'RCB-ADD-TO-SALES-DEMAND', type: String, length: 1 }
+  - { name: 'RCB-ORDER-PRIORITY', type: Integer, length: 1, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-ACCEPT-BACKORDER', type: String, length: 1 }
+  - { name: 'RCB-BACKORDER-DAYS', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-CARRIER', type: String, length: 2 }
+  - { name: 'RCB-SALESMAN', type: String, length: 2 }
+  - { name: 'RCB-TERRITORY', type: String, length: 2 }
+  - { name: 'RCB-COMMISSION-PERCENT', type: Packed, length: 3, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-RUN', type: String, length: 2 }
+  - { name: 'RCB-RUN-SEQUENCE', type: Integer, length: 6, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-COMMENT-LINE-1', type: String, length: 30 }
+  - { name: 'RCB-COMMENT-LINE-2', type: String, length: 30 }
+  - { name: 'RCB-COMMENT-LINE-3', type: String, length: 30 }
+  - { name: 'RCB-COMMENT-LINE-4', type: String, length: 30 }
+  - { name: 'RCB-INVOICE-COPIES', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-COPIES-INSTRUCTIONS-1', type: String, length: 30 }
+  - { name: 'RCB-COPIES-INSTRUCTIONS-2', type: String, length: 30 }
+  - { name: 'RCB-SALES-MTD', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-SALES-YTD', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-SALES-LY', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-MARGIN-MTD', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-MARGIN-YTD', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-MARGIN-LY', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-CREDITS-MTD', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-CREDITS-YTD', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-CREDITS-LY', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-NO-OF-ORDERS-MTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-ORDERS-YTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-ORDERS-LY', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-SALES-MTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-SALES-YTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-SALES-LY', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-ORDER-LINES-MTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-ORDER-LINES-YTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-ORDER-LINES-LY', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-SALES-LINES-MTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-SALES-LINES-YTD', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-NO-OF-SALES-LINES-LY', type: Packed, length: 3, format: { signed: TRUE } }
+  - { name: 'RCB-MARKUP-A-PERC', type: Packed, length: 3, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-MARKUP-B-PERC', type: Packed, length: 3, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-MARKUP-C-PERC', type: Packed, length: 3, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-INVOICE-TO-EMAIL', type: String, length: 1 }
+  - { name: 'RCB-PRINT-INVOICE', type: String, length: 1 }
+  - { name: 'RCB-PRINT-DELIVERY-DOCKET', type: String, length: 1 }
+  - { name: 'RCB-DELIVERY-ZONE', type: String, length: 2 }
+  - { name: 'RCB-STATE', type: String, length: 3 }
+  - { name: 'RCB-CHEP-PALLETS-OWING', type: Integer, length: 6, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-LOSCAM-PALLETS-OWING', type: Integer, length: 6, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-OTHER-PALLETS-OWING', type: Integer, length: 6, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-NORMAL-SUPPLY-WH', type: String, length: 2 }
+  - { name: 'RCB-CREDIT-CARD-TYPE', type: String, length: 3 }
+  - { name: 'RCB-CREDIT-CARD-NUMBER', type: String, length: 16 }
+  - name: 'RCB-CR-CARD-EXPIRY-DATE'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-CR-CARD-EXPIRY-DATE-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-CR-CARD-EXPIRY-DATE-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-CR-CARD-EXPIRY-DATE-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-CR-CARD-EXPIRY-DATE-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-CR-CARD-EXPIRY-DATE-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-DRUGS-PERMIT-NUMBER', type: String, length: 10 }
+  - { name: 'RCB-DIRECT-SHIP-WH', type: String, length: 2 }
+  - { name: 'RCB-S8-WH', type: String, length: 2 }
+  - { name: 'RCB-FOOD-WH', type: String, length: 2 }
+  - { name: 'RCB-K9-WH', type: String, length: 2 }
+  - { name: 'RCB-BULKY-GOODS-WH', type: String, length: 2 }
+  - { name: 'RCB-COLD-GOODS-SEPARATE', type: String, length: 1 }
+  - { name: 'RCB-COLD-GOODS-CARRIER', type: String, length: 2 }
+  - { name: 'RCB-DANG-GOODS-SEPARATE', type: String, length: 1 }
+  - { name: 'RCB-DANG-GOODS-CARRIER', type: String, length: 2 }
+  - { name: 'RCB-BULKY-GOODS-SEPARATE', type: String, length: 1 }
+  - { name: 'RCB-BULKY-GOODS-CARRIER', type: String, length: 2 }
+  - { name: 'RCB-FILLER-1', type: String, length: 1 }
+  - { name: 'RCB-SORT-CODE', type: String, length: 20 }
+  - { name: 'RCB-NOTE-1', type: String, length: 30 }
+  - { name: 'RCB-NOTE-2', type: String, length: 30 }
+  - { name: 'RCB-NOTE-3', type: String, length: 30 }
+  - name: 'RCB-MSDS-CD-SENT-DATE'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-MSDS-CD-SENT-DATE-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-MSDS-CD-SENT-DATE-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-MSDS-CD-SENT-DATE-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-MSDS-CD-SENT-DATE-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-MSDS-CD-SENT-DATE-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-MSDS-DOCS-REQUIRED', type: String, length: 1 }
+  - { name: 'RCB-ORDER-NOTIFICATION-REQD', type: String, length: 1 }
+  - { name: 'RCB-GST-TO-BE-CHARGED', type: String, length: 1 }
+  - { name: 'RCB-EXPORT-CUSTOMER', type: String, length: 1 }
+  - { name: 'RCB-CUSTOMER-ABN', type: String, length: 15 }
+  - { name: 'RCB-BRICK-CODE', type: String, length: 4 }
+  - { name: 'RCB-CUSTOMER-SALES-GROUP-D', type: String, length: 4 }
+  - { name: 'RCB-CUSTOMER-SALES-GROUP-E', type: String, length: 4 }
+  - { name: 'RCB-PROMOTION-CODE', type: String, length: 8 }
+  - { name: 'RCB-EMAIL-ADDRESS', type: String, length: 50 }
+  - { name: 'RCB-MEMBERSHIP', type: String, length: 1 }
+  - { name: 'RCB-EDI-EMAIL-AT-PICKING', type: String, length: 1 }
+  - { name: 'RCB-SOS-MTH-SALES-LIMIT', type: Packed, length: 4, format: { signed: TRUE } }
+  - { name: 'RCB-SOS-MTH-PRODUCT', type: String, length: 6 }
+  - { name: 'RCB-SOS-ORDER-LIMIT', type: Packed, length: 4, format: { signed: TRUE } }
+  - { name: 'RCB-SOS-ORDER-PRODUCT', type: String, length: 6 }
+  - { name: 'RCB-SOS-SALES-ORDER-FLAG', type: String, length: 1 }
+  - { name: 'RCB-EDI-TO-WH', type: String, length: 1 }
+  - { name: 'RCB-S8-DRUG-LICENCE', type: String, length: 8 }
+  - name: 'RCB-DRUGS-EXPIRY-DATE'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-DRUGS-EXPIRY-DATE-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-DRUGS-EXPIRY-DATE-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-DRUGS-EXPIRY-DATE-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-DRUGS-EXPIRY-DATE-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-DRUGS-EXPIRY-DATE-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-FOOD-CARRIER', type: String, length: 2 }
+  - { name: 'RCB-S8-CARRIER', type: String, length: 2 }
+  - { name: 'RCB-ADDRESS-LINE-4', type: String, length: 30 }
+  - { name: 'RCB-MSDS-EMAIL', type: String, length: 50 }
+  - { name: 'RCB-CUSTOMER-GROUP-WH', type: String, length: 2 }
+  - { name: 'RCB-FILLER-2', type: String, length: 2 }
+  - { name: 'RCB-RCPO-REQUIRED', type: String, length: 1 }
+  - { name: 'RCB-RCPO-EMAIL', type: String, length: 50 }
+  - { name: 'RCB-NORMAL-FREIGHT-PRODUCT', type: String, length: 5 }
+  - { name: 'RCB-NORMAL-FREIGHT-LIMIT', type: Packed, length: 4, format: { signed: TRUE } }
+  - { name: 'RCB-ORDERS-SPLIT', type: String, length: 1 }
+  - { name: 'RCB-HENDRA-ACCREDITATION-COD', type: String, length: 6 }
+  - { name: 'RCB-AGREEMENT-TYPE', type: String, length: 1 }
+  - { name: 'RCB-AGREEMENT-REFERENCE', type: String, length: 10 }
+  - { name: 'RCB-AGREED-ANNUAL-TARGET', type: Packed, length: 6, format: { implicit: 2, signed: TRUE } }
+  - name: 'RCB-AGREEMENT-START-DATE'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-AGREEMENT-START-DATE-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-AGREEMENT-START-DATE-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-AGREEMENT-START-DATE-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-AGREEMENT-START-DATE-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-AGREEMENT-START-DATE-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - name: 'RCB-AGREEMENT-END-DATE'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-AGREEMENT-END-DATE-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-AGREEMENT-END-DATE-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-AGREEMENT-END-DATE-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-AGREEMENT-END-DATE-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-AGREEMENT-END-DATE-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-SHAREHOLDER-EMAIL', type: String, length: 50 }
+  - { name: 'RCB-SHAREHOLDER-LAST-NAME', type: String, length: 25 }
+  - { name: 'RCB-SHAREHOLDER-TITLE', type: String, length: 4 }
+  - { name: 'RCB-SHAREHOLDER-FIRST', type: String, length: 16 }
+  - { name: 'RCB-SHAREHOLDER-USE', type: String, length: 1 }
+  - { name: 'RCB-SEND-INFO-TO-SHAREHOLDER', type: String, length: 1 }
+  - { name: 'RCB-SEND-INVOICE-TO-EMAIL', type: String, length: 1 }
+  - { name: 'RCB-SHOW-OLD-B-O-ON-INVOICE', type: String, length: 1 }
+  - { name: 'RCB-IGNORE-NORMAL-QTYS', type: String, length: 1 }
+  - { name: 'RCB-FRGHT-IF-MORE-THAN-1-PER', type: String, length: 1 }
+  - { name: 'RCB-FRGHT-IF-MORE-PRODUCT', type: String, length: 5 }
+  - { name: 'RCB-INDIVIDUAL-ORDER', type: String, length: 1 }
+  - { name: 'RCB-FOOD-ORDER', type: String, length: 1 }
+  - { name: 'RCB-FRGHT-ORDER-LIMIT', type: Packed, length: 4, format: { signed: TRUE } }
+  - { name: 'RCB-FRGHT-ORDER-PRODUCT', type: String, length: 6 }
+  - { name: 'RCB-ALIGHT', type: String, length: 1 }
+  - { name: 'RCB-DOWNLOAD-NETT-PRICE', type: String, length: 1 }
+  - { name: 'RCB-DISALLOW-PRICE-OVERRIDE', type: String, length: 1 }
+  - { name: 'RCB-DISALLOW-ZERO-PRICE', type: String, length: 1 }
+  - { name: 'RCB-ALLOW-PARTIAL-DD', type: String, length: 1 }
+  - { name: 'RCB-MINIMUM-MONTHLY-SPEND', type: Packed, length: 5, format: { implicit: 2, signed: TRUE } }
+  - name: 'RCB-MMS-START-DATE'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-MMS-START-DATE-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-MMS-START-DATE-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-MMS-START-DATE-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-MMS-START-DATE-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-MMS-START-DATE-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-MINIMUM-ORDER-VALUE', type: Packed, length: 5, format: { implicit: 2, signed: TRUE } }
+  - { name: 'RCB-PALLET-FREIGHT-CODE', type: String, length: 5 }
+  - { name: 'RCB-SKIDS-FREIGHT-CODE', type: String, length: 5 }
+  - { name: 'RCB-ACCOUNT-TYPE', type: String, length: 1 }
+  - { name: 'RCB-SPLIT-EQUIPMENT', type: String, length: 1 }
+  - { name: 'RCB-SPLIT-TOOL-INSTRUMENT', type: String, length: 1 }
+  - { name: 'RCB-SATCHELS-FREIGHT-CODE', type: String, length: 5 }
+  - { name: 'RCB-CARTONS-FREIGHT-CODE', type: String, length: 5 }
+  - { name: 'RCB-MOBILE', type: String, length: 10 }
+  - { name: 'RCB-FILLER', type: String, length: 126 }
+- name: 'RCB-CONTROLS'
+  maxLength: 37
+  values: 
+  - name: 'RCB-SECURITY'
+    maxLength: 2
+    values: 
+    - { name: 'RCB-SECURITY-1', type: String, length: 1 }
+    - { name: 'RCB-SECURITY-2', type: String, length: 1 }
+  - name: 'RCB-DATE-CREATED'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-DATE-CREATED-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-DATE-CREATED-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-DATE-CREATED-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-DATE-CREATED-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-DATE-CREATED-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-TIME-CREATED', type: Integer, length: 6, format: { justify: ZEROES, sign: UNSIGNED } }
+  - name: 'RCB-DATE-LAST-MODIFIED'
+    maxLength: 8
+    values: 
+    - { name: 'RCB-DATE-LAST-MODIFIED-CC', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+    - name: 'RCB-DATE-LAST-MODIFIED-6X'
+      maxLength: 6
+      values: 
+      - { name: 'RCB-DATE-LAST-MODIFIED-YY', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-DATE-LAST-MODIFIED-MM', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+      - { name: 'RCB-DATE-LAST-MODIFIED-DD', type: Integer, length: 2, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-TIME-LAST-MODIFIED', type: Integer, length: 6, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-OPERATOR-NAME', type: String, length: 3 }
+  - { name: 'RCB-WORKSTATION-NUMBER', type: Integer, length: 3, format: { justify: ZEROES, sign: UNSIGNED } }
+  - { name: 'RCB-STATUS', type: String, length: 1 }

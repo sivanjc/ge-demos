@@ -1,0 +1,50 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "Eclipse Workflows API v1.30-alpha"
+  },
+  "host": "azuvnintfint611.fastts.firstam.net",
+  "basePath": "/workflowapis",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/api/workflows/{fileId}/tasks/{taskId}/taskEvents": {
+      "get": {
+        "tags": [
+          "Workflows"
+        ],
+        "operationId": "Workflows_GetTaskEvents",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+  xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+  <flow name="realtime" doc:id="1da06eb6-c559-4818-871b-e489fcdc1409">
+    <db:listener doc:name="On Table Row" doc:id="ec5a24cc-a75a-488a-8625-c01132758fc0">
+      <scheduling-strategy>
+        <fixed-frequency />
+      </scheduling-strategy>
+    </db:listener>
+    <ee:transform doc:name="Transform Message" doc:id="a6571b5f-e5b5-42b2-8317-2a2514480eee">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <salesforce:create doc:name="Create" doc:id="f96b176c-4a75-411e-8252-228d38f14b11" />
+  </flow>
+  <flow name="realtime-high-volume-1000" doc:id="20db6b63-ac7c-4ca8-bf5e-0fd75e78e019">
+    <scheduler doc:name="Scheduler" doc:id="b2e54b38-3d1e-4854-a20f-5277c75e5562">
+      <scheduling-strategy>
+        <fixed-frequency frequency="10s" />
+      </scheduling-strategy>
+    </scheduler>
+    <db:select doc:name="Select 1000" doc:id="6ec00179-33a9-4fac-ac9a-9bbfa50e3b2e" />
+    <ee:transform doc:name="Transform Message" doc:id="b107ed3f-b548-484f-8b5a-0b087cee5d88" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <foreach doc:name="For Each" doc:id="f6d98b69-b60e-4297-be70-9df62d1e45ec" batchSize="200">
+      <salesforce:upsert doc:name="Upsert" doc:id="a62f3cb2-186d-4a9f-908e-c9cdd49b8bba" />
+    </foreach>
+  
+</flow>
+<flow name="realtime-high-volume-100000" doc:id="25e2b75c-ce07-44a0-8ccc-1ead5d6bc220">
+    <scheduler doc:name="Scheduler" doc:id="654e2df6-d541-4608-a875-52a3b493cf33">
+      <scheduling-strategy>
+        <fixed-frequency frequency="10s" />
+      </scheduling-strategy>
+    </scheduler>
+    <db:select doc:name="Select 1000000" doc:id="f5d5beb4-ce1e-4369-9ad3-731acf09221f" fetchSize="1000"/>
+    <ee:transform doc:name="Transform Message" doc:id="1a0474ba-c338-4b4a-bd35-f5ba242e09b8" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+{
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <foreach doc:name="For Each" doc:id="972065f0-f9ab-4be2-ab8c-a323ece39441" batchSize="100000">
+      <salesforce:upsert doc:name="Upsert" doc:id="17e1483f-bfa3-4c5d-957c-aa6ec666097b" />
+    </foreach>
+  
+
+</flow>
+  <flow name="db-sfdc-syncFlow" doc:id="976e1efc-ce23-442d-ae5e-3485f373f831" >
+    <db:select doc:name="Select" doc:id="19378b0f-e59a-487e-bd09-714411dce9bd" />
+    <batch:job jobName="db-sfdc-syncBatch_Job" doc:id="49d4e5e7-deb8-4cf9-b850-af0b9fe7f546" blockSize="10000">
+      <batch:process-records >
+        <batch:step name="Batch_Step" doc:id="8a1d4b2f-eee1-48c6-b7d6-2e11d3c813bd" />
+      </batch:process-records>
+    </batch:job>
+  </flow>
+</mule>

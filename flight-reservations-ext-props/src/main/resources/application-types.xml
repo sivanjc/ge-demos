@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+  -->
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+    <types:catalog>
+        <types:type name="flights" format="json">
+            <types:example format="json" location="flights.json"/>
+        </types:type>
+        <types:type name="flightStage1" format="json">
+            <types:example format="json" location="examples/aFlight.json"/>
+        </types:type>
+        <types:type name="enrichedFlights" format="json">
+            <types:example format="json" location="examples/enrichedFlights.json"/>
+        </types:type>
+    </types:catalog>
+    <types:enrichment select="#1a365dc2-972a-4917-b964-c8c13e44db36">
+        <types:processor-declaration>
+            <types:input-event>
+                <types:message>
+                    <types:payload type="flightStage1"/>
+                </types:message>
+            </types:input-event>
+        </types:processor-declaration>
+    </types:enrichment>
+    <types:enrichment select="#b9ffa730-8000-4d57-8fa9-4c274dfdeb97">
+        <types:processor-declaration>
+            <types:input-event>
+                <types:message>
+                    <types:payload type="flightStage1"/>
+                </types:message>
+            </types:input-event>
+        </types:processor-declaration>
+    </types:enrichment>
+    <types:enrichment select="#ad9ff985-a2db-4a14-aa55-13cfd1e0eedb">
+        <types:processor-declaration>
+            <types:input-event>
+                <types:message>
+                    <types:payload type="enrichedFlights"/>
+                </types:message>
+            </types:input-event>
+        </types:processor-declaration>
+    </types:enrichment>
+    <types:enrichment select="#3723cf40-02c9-4bbc-b7fc-76e601e3cc44">
+        <types:processor-declaration>
+            <types:input-event>
+                <types:message>
+                    <types:payload type="enrichedFlights"/>
+                </types:message>
+            </types:input-event>
+        </types:processor-declaration>
+    </types:enrichment>
+</types:mule>

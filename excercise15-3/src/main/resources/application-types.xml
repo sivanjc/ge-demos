@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+  -->
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types"></types:mule>

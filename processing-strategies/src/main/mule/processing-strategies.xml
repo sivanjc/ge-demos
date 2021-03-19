@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+  <db:config name="Database_Config" doc:name="Database Config" doc:id="55c67e78-b664-4f6b-84d5-6145f63ebe9b" >
+    <db:data-source-connection >
+      <reconnection failsDeployment="true" >
+        <reconnect-forever />
+      </reconnection>
+    </db:data-source-connection>
+  </db:config>
+  <configuration doc:name="Configuration" doc:id="143ab9b2-5ecd-43d0-98c3-5307e0c22cfb" defaultErrorHandler-ref="myglobalerrorhandler" />
+  <error-handler name="myglobalerrorhandler" doc:id="f2b223d1-9a43-4d4d-9c5f-d5a70244f363" >
+    <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ebec810b-b040-4951-ba5f-d1cfa7341b30" />
+    <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2965459a-fd1d-4908-bc3d-93a215fb5e58" />
+  </error-handler>
+  <flow name="processing-strategiesFlow6" doc:id="a21812d1-538a-496f-bb12-cac03a839d8b" >
+  </flow>
+  <flow name="processing-strategiesFlow7" doc:id="67a7517e-2b47-4bf8-91e4-14217f3570d6" >
+    <jms:listener doc:name="On New Message" doc:id="f82ee49b-ffa7-4a6c-a246-1a8e7c10325f" numberOfConsumers="1"/>
+  </flow>
+  <flow name="processing-strategiesFlow5" doc:id="ab18c7f3-8c91-4603-af5a-2513eff6af34" >
+    <vm:listener doc:id="d002c541-c20b-40f0-92e5-78c0bd07be68" numberOfConsumers="1"/>
+  </flow>
+  <flow name="processing-strategiesFlow3" doc:id="d62f8413-ffb4-4335-b3ec-9df971c6e20e" >
+    <file:listener doc:name="On New or Updated File" doc:id="ec5fd178-d469-4ee9-92ae-b5ee5a617450" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </file:listener>
+    <ee:transform doc:name="Transform Message" doc:id="29d6ee8b-1f90-4d6b-a833-d4097a865887" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <foreach doc:name="For Each" doc:id="7a0a0449-f3c5-40a1-8a8b-84eb695b2304" >
+      <db:bulk-insert doc:name="Bulk insert" doc:id="b7d0e0d0-67aa-4e0a-a70c-dea9e6651d17" />
+    </foreach>
+  </flow>
+  <flow name="processing-strategiesFlow" doc:id="20faaaf2-904c-430c-8fa1-457fc6f75018" >
+    <db:listener doc:name="On Table Row" doc:id="7adcf6fe-9b47-47f4-9a10-46d05fa88243" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </db:listener>
+    <db:insert doc:name="Insert" doc:id="6cc1fd6e-f1eb-4a29-a5a7-0953f7ce554b" />
+  </flow>
+  <flow name="processing-strategiesFlow4" doc:id="aae68d74-ce88-4141-9e26-5ccd9848e77c" >
+    <http:listener doc:name="Listener" doc:id="f312eb68-d42d-4a43-92a8-2cd1391c6710" />
+    <idempotent-message-validator doc:name="Idempotent Message Validator" doc:id="7a28af3a-91b0-4ce0-843d-c327108ec9d4" />
+  </flow>
+  <flow name="processing-strategiesFlow1" doc:id="338200b6-2760-4792-9e0c-f3bf9b8cc9a5" >
+    <scheduler doc:name="Scheduler" doc:id="8129f577-07e0-487c-9de9-7f3edc71d9da" >
+      <scheduling-strategy >
+        <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+      </scheduling-strategy>
+    </scheduler>
+    <os:retrieve doc:id="6ea21453-7f73-422f-87a0-dc34b8743a39" key="watermark">
+      <os:default-value ><![CDATA[0]]></os:default-value>
+    </os:retrieve>
+    <db:select doc:name="Select 100" doc:id="2df9983e-0bd5-4a3e-9b24-2fbf06a8a8a7" fetchSize="10" maxRows="100"/>
+    <foreach doc:name="For Each" doc:id="522dd197-ed6f-452d-90b5-ab346bd262b4" batchSize="100">
+      <db:bulk-insert doc:name="Bulk insert 100" doc:id="9cccf446-33e9-4bb8-957b-de727b51132d" />
+    </foreach>
+    <os:store doc:name="Store" doc:id="3a4daf2f-cd46-40ce-9764-8261916036f9" key="watermark">
+      <os:value ><![CDATA[#[maxOf(timestamp)]]]></os:value>
+    </os:store>
+  </flow>
+  
+    <flow name="processing-strategiesFlow1" doc:id="73e1ede5-eb79-4655-870f-e45905f387a3" >
+    <scheduler doc:name="Scheduler" doc:id="72fa443b-0f1a-45cd-870d-b57e2e2b3bc6" >
+      <scheduling-strategy >
+        <cron />
+      
+</scheduling-strategy>
+    </scheduler>
+    <os:retrieve doc:id="ee4a74c6-69e6-4185-912a-8dc7220349d6" key="watermark">
+      <os:default-value ><![CDATA[0]]></os:default-value>
+    </os:retrieve>
+    <db:select doc:name="Select 100000" doc:id="4004151b-0849-4e34-94ef-30881664083d" fetchSize="10"/>
+    <foreach doc:name="For Each" doc:id="5161f836-7d3d-4a7a-b6a6-031ac070d945" batchSize="10000">
+      <until-successful maxRetries="5" doc:name="Until Successful" doc:id="ac29c2ed-b7d2-41fd-aa72-38e467fb256e" >
+        <db:bulk-insert doc:name="Bulk insert 100" doc:id="4dc533b0-9f16-4037-8952-e49c6b1425ce" config-ref="Database_Config"/>
+      </until-successful>
+    </foreach>
+    <raise-error doc:name="Raise error" doc:id="94d74022-ae30-4398-b0ae-60e31330f721" />
+    <os:store doc:name="Store" doc:id="561611be-9438-40f1-881a-842ec4b47da6" key="watermark">
+      <os:value ><![CDATA[#[maxOf(timestamp)]]]></os:value>
+    </os:store>
+    <error-handler >
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1371eb59-cc35-489c-850f-18e4a1c1189c" >
+        <jms:publish doc:id="70267957-0f1d-40c2-a4ba-cdf871ec40b5" doc:name="Publish DLQ"/>
+      </on-error-propagate>
+    </error-handler>
+  
+</flow>
+  <flow name="processing-strategiesFlow2" doc:id="31e611aa-05bb-4112-b6f4-dd27ab20c2a5" maxConcurrency="1">
+    <scheduler doc:name="Scheduler" doc:id="85efdfb4-a09f-406f-8c33-7d6f47cae267" >
+      <scheduling-strategy >
+        <fixed-frequency frequency="100"/>
+      </scheduling-strategy>
+    </scheduler>
+    <os:retrieve doc:name="Copy_of_Retrieve" doc:id="fa7067bb-ae36-4ca4-a5ed-015630c6ef92" key="watermark">
+      <os:default-value><![CDATA[0]]></os:default-value>
+    </os:retrieve>
+    <try doc:name="Try" doc:id="bc96181c-2acf-4c7a-9d45-23e604fba194">
+      <db:select doc:name="Copy_of_Select 100000" doc:id="47b4f40c-7a9b-46f7-ace1-7222814a8bdf" fetchSize="10" >
+        <error-mapping sourceType="DB:CONNECTIVITY" targetType="ORACLE:DB1-CONNECTIVITY-ERROR" />
+      </db:select>
+      <error-handler >
+        <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="85e21dd1-a82c-412f-b1b2-f1d65cf490d9" type="ORACLE:DB1-CONNECTIVITY-ERROR"/>
+        <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="58599ca7-bc62-4d66-be25-0fd59e4fb329" />
+      </error-handler>
+    </try>
+    <batch:job jobName="processing-strategiesBatch_Job" doc:id="d4eb1230-6e5f-4cab-a1a5-076d2c56ff0e" >
+      <batch:process-records >
+        <batch:step name="Batch_Step" doc:id="d1db9c7f-8518-468b-aa8f-e42e953b56a4" />
+        <batch:step name="Batch_Step1" doc:id="0ae4706d-c776-4ccb-bbdf-1f6b0279c31b" />
+      </batch:process-records>
+    </batch:job>
+    <os:store doc:name="Copy_of_Store" doc:id="5a1419aa-0e96-4efc-9378-ff5921c3bd87" key="watermark" >
+      <os:value ><![CDATA[#[maxOf(timestamp)]]]></os:value>
+    </os:store>
+    <error-handler >
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b51f7642-0a89-459a-86ad-95a3eb80775e" />
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3f0c08e1-3305-44b6-946b-2ac49ad21999" />
+    </error-handler>
+  </flow>
+</mule>

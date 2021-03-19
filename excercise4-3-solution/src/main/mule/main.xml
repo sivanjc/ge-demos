@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+-->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd  http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd  http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+    <!-- ... -->
+    <flow name="processing-singleJMSMessageFlow" initialState="stopped">
+        <file:listener doc:name="On New or Updated File" config-ref="File_Config" directory="input" autoDelete="true" doc:id="1968ac45-f5c4-4126-bdf6-d6c34068d35d">
+            <scheduling-strategy>
+                <fixed-frequency/>
+            </scheduling-strategy>
+            <file:matcher filenamePattern="*.csv"/>
+        </file:listener>
+        <set-variable value="#[output application/java ---payload]" doc:name="customerRecordsFromFile" doc:id="5cba3bef-2d72-4ee5-acf8-c38f547521c3" variableName="customerRecordsFromFile"/>
+        <foreach doc:name="For Each" collection="#[vars.customerRecordsFromFile]">
+            <logger level="INFO" doc:name="Logger" doc:id="70a6e3ad-de91-4598-b380-79d05b7639ee"/>
+            <ee:transform doc:name="Transform Message">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+
+{
+"region" : payload.Region,
+"country" : payload.Country,
+"item_type" : payload."Item Type",
+"sales_channel" : payload."Sales Channel", 
+order_priority: payload."Order Priority", 
+order_date : payload."Order Date", 
+order_id : payload."Order ID",
+ship_date : payload."Ship Date",
+units_sold : payload."Units Sold",
+unit_price : payload."Unit Price",
+unit_cost : payload."Unit Cost",
+total_revenue : payload."Total Revenue", 
+total_cost : payload."Total Cost",
+total_profit : payload."Total Profit"
+}]]></ee:set-payload>
+                </ee:message>
+            </ee:transform>
+            <jms:publish doc:name="JMS financialQ" doc:id="cac8a2df-135b-4ef4-88d2-42c9f0dedaf2" config-ref="JMS_Config" destination="financialQ">
+                <jms:message>
+                    <jms:body><![CDATA[#[output application/json --- payload]]]></jms:body>
+                    <jms:properties><![CDATA[#[{"publisher":"training"}]]]></jms:properties>
+                </jms:message>
+            </jms:publish>
+        </foreach>
+        <ee:transform doc:name="Transform Message" doc:id="8f98b815-62b3-4a9a-8fca-8dba612973a7">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="4ddcfc7b-fc94-45c9-869f-c25353c84402"/>
+    </flow>
+    <flow name="processing-JMSInsertFlow" doc:id="a8d7652d-2605-4bb9-9558-c62de67d9306" initialState="stopped">
+        <jms:listener doc:name="On New Message" doc:id="6223ad02-1f11-4ed8-b975-a190ddc4317c" config-ref="JMS_Config" destination="financialQ"/>
+        <set-variable value="#[payload]" doc:name="Set Variable" doc:id="f5f567d7-db00-48e3-8ec4-f6d3507aa0df" variableName="originalPayload"/>
+        <db:insert doc:name="Insert" doc:id="4683c155-5310-4139-84e4-733ed8f7ff2d" config-ref="Database_Config">
+            <db:sql><![CDATA[INSERT INTO sales
+(region, country, item_type, sales_channel, order_priority, order_date, order_id, ship_date, units_sold, unit_price, unit_cost, total_revenue, total_cost, total_profit)
+VALUES 
+(:region, :country, :item_type, :sales_channel, :order_priority, :order_date, :order_id, :ship_date, :units_sold, :unit_price, :unit_cost, :total_revenue, :total_cost, :total_profit)]]></db:sql>
+            <db:input-parameters><![CDATA[#[payload]]]></db:input-parameters>
+        </db:insert>
+        <error-handler>
+            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="af8febc7-6a4c-46f6-be8a-e4fe0a237908" type="REDELIVERY_EXHAUSTED">
+                <set-payload doc:name="Set Payload" doc:id="b3e3f7e2-63d3-4339-8dbe-858c91cf658b" value="#[vars.originalPayload]"/>
+                <logger level="INFO" doc:name="Logger" doc:id="e8a58ef4-f8bc-4e67-9ce3-8b459a4917a1"/>
+                <jms:publish doc:name="Publish Error Queue(DLQ)" doc:id="fc05ee1a-13c2-4c05-b14c-a0089f7166de" config-ref="JMS_Config" destination="DLQ"/>
+            </on-error-continue>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e81bef75-fce7-4742-97dd-99a66c0bf1ad" type="ANY">
+                <logger level="INFO" doc:name="Logger" doc:id="4a79cae4-7526-4129-bd63-379f1b16e3b9"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="processing-SingleBatchMessageFlow" initialState="stopped">
+        <file:listener doc:name="On New or Updated File" doc:id="649151f6-d548-419e-9ae6-85681cecda23" config-ref="File_Config" directory="input" autoDelete="true">
+            <scheduling-strategy>
+                <fixed-frequency/>
+            </scheduling-strategy>
+            <file:matcher filenamePattern="*.csv"/>
+        </file:listener>
+        <logger level="INFO" doc:name="Logger" doc:id="07ab287f-006d-463b-b6d9-2fd9a77aaf8a"/>
+        <set-variable value="#[dw::util::Timer::currentMilliseconds()]" doc:name="Set Variable" doc:id="bf00f41a-2be3-4f5f-8e0f-094802901708" variableName="begin"/>
+        <ee:transform doc:name="CSV to Java">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <batch:job jobName="processing-moduleBatch_Job">
+            <batch:process-records>
+                <batch:step name="Batch_Step" acceptPolicy="ALL">
+                    <batch:aggregator doc:name="Batch Aggregator" size="100">
+                        <ee:transform doc:name="Transform Message">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map (item) -> 
+{
+"region" : item.Region,
+"country" : item.Country,
+"item_type" : item."Item Type",
+"sales_channel" : item."Sales Channel", 
+order_priority: item."Order Priority", 
+order_date : item."Order Date", 
+order_id : item."Order ID",
+ship_date : item."Ship Date",
+units_sold : item."Units Sold",
+unit_price : item."Unit Price",
+unit_cost : item."Unit Cost",
+total_revenue : item."Total Revenue", 
+total_cost : item."Total Cost",
+total_profit : item."Total Profit"
+}]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        <db:bulk-insert doc:name="Bulk insert" config-ref="Database_Config">
+                            <db:sql><![CDATA[INSERT INTO sales
+(region, country, item_type, sales_channel, order_priority, order_date, order_id, ship_date, units_sold, unit_price, unit_cost, total_revenue, total_cost, total_profit)
+VALUES 
+(:region, :country, :item_type, :sales_channel, :order_priority, :order_date, :order_id, :ship_date, :units_sold, :unit_price, :unit_cost, :total_revenue, :total_cost, :total_profit)]]></db:sql>
+                        </db:bulk-insert>
+                    </batch:aggregator>
+                </batch:step>
+                <batch:step name="Failed_Batch_Step" doc:id="c5bb409a-39ac-487c-9585-d15e30442846">
+                    <jms:publish doc:name="Publish Error Queue(DLQ)" doc:id="17e9d8b1-d0fc-4b9c-a01a-230057563100" config-ref="JMS_Config" destination="DLQ"/>
+                </batch:step>
+            </batch:process-records>
+            <batch:on-complete>
+                <ee:transform doc:name="Transform Message" doc:id="9c2bd51a-b1fc-4c98-8ca0-b074eff17265">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+import dw::util::Timer
+output application/json
+---
+Timer::currentMilliseconds() - vars.begin]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+            </batch:on-complete>
+        </batch:job>
+    </flow>
+    <flow name="filetoMySQLFlow-parallelforeach" initialState="started">
+        <file:listener doc:name="On New or Updated File" config-ref="File_Config" directory="input" autoDelete="true">
+            <scheduling-strategy>
+                <fixed-frequency/>
+            </scheduling-strategy>
+            <file:matcher filenamePattern="*.csv"/>
+        </file:listener>
+        <set-variable value="#[output application/java ---payload]" doc:name="customerRecordsFromFile" doc:id="699bcd62-09a5-42b4-872c-3874d3c90e80" variableName="customerRecordsFromFile"/>
+        <parallel-foreach doc:name="Parallel For Each" collection="#[vars.customerRecordsFromFile]" maxConcurrency="${max_Concurrency}">
+            <ee:transform doc:name="Transform Message">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+
+{
+"region" : payload.Region,
+"country" : payload.Country,
+"item_type" : payload."Item Type",
+"sales_channel" : payload."Sales Channel", 
+order_priority: payload."Order Priority", 
+order_date : payload."Order Date", 
+order_id : payload."Order ID",
+ship_date : payload."Ship Date",
+units_sold : payload."Units Sold",
+unit_price : payload."Unit Price",
+unit_cost : payload."Unit Cost",
+total_revenue : payload."Total Revenue", 
+total_cost : payload."Total Cost",
+total_profit : payload."Total Profit"
+}]]></ee:set-payload>
+                </ee:message>
+            </ee:transform>
+            <db:insert doc:name="Insert" config-ref="Database_Config">
+                <db:sql><![CDATA[INSERT INTO sales
+(region, country, item_type, sales_channel, order_priority, order_date, order_id, ship_date, units_sold, unit_price, unit_cost, total_revenue, total_cost, total_profit)
+VALUES 
+(:region, :country, :item_type, :sales_channel, :order_priority, :order_date, :order_id, :ship_date, :units_sold, :unit_price, :unit_cost, :total_revenue, :total_cost, :total_profit)]]></db:sql>
+                <db:input-parameters><![CDATA[#[payload]]]></db:input-parameters>
+            </db:insert>
+        </parallel-foreach>
+        <error-handler>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1b689c16-df89-48d1-9abb-e1bef0ed2b1a" type="ANY">
+                <jms:publish doc:name="Publish Error Queue(DLQ)" doc:id="15806c62-b7e2-4c83-adf8-e6b4cd29f3c9" config-ref="JMS_Config" destination="DLQ"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="filetoMySQLFlow" initialState="stopped">
+        <file:listener doc:name="On New or Updated File" config-ref="File_Config" directory="input" autoDelete="true">
+            <scheduling-strategy>
+                <fixed-frequency/>
+            </scheduling-strategy>
+            <file:matcher filenamePattern="*.csv"/>
+        </file:listener>
+        <set-variable value="#[output application/java ---payload]" doc:name="customerRecordsFromFile" doc:id="afa6cff2-14d2-442c-9026-2bc50f6f2d8d" variableName="customerRecordsFromFile"/>
+        <foreach doc:name="For Each" collection="#[vars.customerRecordsFromFile]" batchSize="${db.batchSize}">
+            <try doc:name="Try" doc:id="55073b0a-6c38-42c5-9aad-1c05738e4c1f">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map (item) -> 
+{
+"region" : item.Region,
+"country" : item.Country,
+"item_type" : item."Item Type",
+"sales_channel" : item."Sales Channel", 
+order_priority: item."Order Priority", 
+order_date : item."Order Date", 
+order_id : item."Order ID",
+ship_date : item."Ship Date",
+units_sold : item."Units Sold",
+unit_price : item."Unit Price",
+unit_cost : item."Unit Cost",
+total_revenue : item."Total Revenue", 
+total_cost : item."Total Cost",
+total_profit : item."Total Profit"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <db:bulk-insert doc:name="Bulk insert" config-ref="Database_Config">
+                    <db:sql><![CDATA[INSERT INTO sales
+(region, country, item_type, sales_channel, order_priority, order_date, order_id, ship_date, units_sold, unit_price, unit_cost, total_revenue, total_cost, total_profit)
+VALUES 
+(:region, :country, :item_type, :sales_channel, :order_priority, :order_date, :order_id, :ship_date, :units_sold, :unit_price, :unit_cost, :total_revenue, :total_cost, :total_profit)]]></db:sql>
+                </db:bulk-insert>
+                <error-handler>
+                    <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a0aab261-4b46-4b50-8115-189e56ca80de" type="ANY">
+                        <jms:publish doc:name="Publish Error Queue(DLQ)" doc:id="15325b20-0b35-449a-a408-f266e5d16c74" config-ref="JMS_Config" destination="DLQ"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </foreach>
+    </flow>
+</mule>

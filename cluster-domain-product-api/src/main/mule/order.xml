@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:order-api="http://www.mulesoft.org/schema/mule/order-api" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/order-api http://www.mulesoft.org/schema/mule/order-api/current/mule-order-api.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+  <flow name="api-1Flow" doc:id="674b90b4-97d7-4d24-a577-50f5d5bfb4b1" >
+    <http:listener doc:name="/order" doc:id="38e48426-44c7-4067-9132-3d3fe4cb6c15" config-ref="clusterPort9000" path="/order"/>
+    <set-payload value='#[{ &#10;	orderid  : correlationId,&#10;	orderitem : ( random() * 1000 )as String { format: "0"},&#10;	orderqty : 1&#10;}]' doc:name="Set Payload a Random Order" doc:id="f2468f7b-ca56-45e1-84db-2c8cee14cc87" />
+    <vm:publish doc:name="Publish" doc:id="3bba3ff6-ce2d-47d4-83a2-f1a37d1ef8f9" config-ref="clusterVMConfig" sendCorrelationId="AUTO" queueName="orderQueue"/>
+    <ee:transform doc:name="Transform Message" doc:id="8018c55b-6bd7-4058-9a91-026f1d67f165" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	order : payload
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+  </flow>
+</mule>

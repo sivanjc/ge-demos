@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+  <flow name="get-quotes-from-mqFlow" doc:id="b4bc6ba3-b95a-4986-9718-94779bfb7aaf" >
+    <anypoint-mq:subscriber doc:name="Subscriber" doc:id="e4dea961-1f6e-48dc-b369-7fba69007354" config-ref="anypointMQConfig" destination="training-mq" outputMimeType="application/json"/>
+    <logger level="INFO" doc:name="Logger" doc:id="dd5b45f0-c45e-481c-aa4c-c5d0c1fde0f9" message="#[payload]" />
+    <choice doc:name="" doc:id="2edf6b56-6640-4bb0-bd44-6383d43999d1" >
+      <when expression='#[attributes.properties.SendBy == "application-1"]'>
+        <anypoint-mq:publish doc:name="Publish" doc:id="9f36b012-3837-4167-a1fb-e07c098c1a56" config-ref="anypointMQConfig" destination="training-mq-mystock">
+          <anypoint-mq:properties ><![CDATA[#[output application/java
+---
+{
+	"SendBy" : "Splitter"
+}]]]></anypoint-mq:properties>
+        </anypoint-mq:publish>
+      </when>
+      <when expression='#[attributes.properties.SendBy == "application-2"]'>
+        <anypoint-mq:publish doc:name="Publish" doc:id="63b4efe8-381d-4d30-979d-4bc29b8c7cb3" config-ref="anypointMQConfig" destination="training-mq-nwstock">
+          <anypoint-mq:properties ><![CDATA[#[output application/java
+---
+{
+	"SendBy" : "Splitter"
+}]]]></anypoint-mq:properties>
+        </anypoint-mq:publish>
+      </when>
+      <otherwise >
+        <anypoint-mq:publish doc:name="Publish" doc:id="4697113c-ea09-4b40-a39d-c67cdad15217" config-ref="anypointMQConfig" destination="training-dlq">
+          <anypoint-mq:properties ><![CDATA[#[output application/java
+---
+{
+	"SendBy" : "Splitter"
+}]]]></anypoint-mq:properties>
+        </anypoint-mq:publish>
+      </otherwise>
+    </choice>
+  </flow>
+</mule>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+  <ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="2e062809-407f-4dec-a9c7-79da4b550edd" >
+    <os:private-object-store alias="gePrivateObjectStore" />
+  </ee:object-store-caching-strategy>
+  <flow name="vm-queueFlow" doc:id="8d60893c-af64-4800-ae01-b36377a0462b" >
+    <http:listener doc:name="Listener" doc:id="de422c47-70f8-4e7d-b1eb-e1d9754df2a3" />
+    <ftp:read doc:id="70489b17-4e11-42c2-bf21-88d5a5972ab3" />
+    <ee:transform doc:name="Transform Message" doc:id="48bd3d4a-5cde-41bd-b43b-b765310edfdc" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <async doc:name="Async" doc:id="20541d9e-410f-4b65-a4a3-3bb6e6948084" >
+      <vm:publish doc:name="Publish" doc:id="c8baf847-521f-4fcf-95f3-a8c44deb34bd" />
+    </async>
+  </flow>
+  <flow name="vm-queueFlow3" doc:id="1cced083-b2d1-49e0-925a-1cab26fc2bdd" >
+    <ftp:listener doc:name="On New or Updated File" doc:id="8b9a9eff-0042-4e6e-8790-4c4226ba6242" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </ftp:listener>
+  </flow>
+  <flow name="vm-queueFlow4" doc:id="860a45eb-9fac-4f26-825e-f48364937528" >
+    <ee:cache doc:name="Cache" doc:id="56fd26f6-1c46-4b87-8743-db1848b42c42" cachingStrategy-ref="Caching_Strategy"/>
+  </flow>
+  <flow name="vm-queueFlow5" doc:id="fd8b4cb2-63eb-4480-b28a-73ff33db2254" >
+    <jms:publish doc:id="c8f7219e-5ed2-4fe3-b72a-66cc1e734a4e" sendCorrelationId="ALWAYS"/>
+  </flow>
+  <flow name="vm-queueFlow2" doc:id="ee9e8fb2-9eda-415e-b6a2-ca51add7f832" >
+    <scheduler doc:name="Scheduler" doc:id="b5418f6e-0787-4e16-a8bc-e25f984ac075" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </scheduler>
+    <ftp:read doc:name="Read" doc:id="ba0c322e-d04d-4724-a18b-41d67f9de47c" />
+  </flow>
+  <flow name="vm-queueFlow1" doc:id="9d3f9b77-0494-46b5-b915-f765eaa428c6" >
+    <vm:listener doc:name="Listener" doc:id="f720fcbb-1a16-432b-a0c0-6a6eeb197748" />
+    <idempotent-message-validator doc:name="Idempotent Message Validator" doc:id="0883f60a-9351-4727-a038-2ef8bb6aed26" />
+    <ee:transform doc:name="Transform Message" doc:id="1ed9c3ae-2f08-4364-9b9d-2b3a8aa2a8d5" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <vm:publish doc:name="Publish" doc:id="1c4c25da-acdd-4934-99ac-b7b5795ff454" sendCorrelationId="AUTO"/>
+  </flow>
+  <flow name="vm-queueFlow6" doc:id="ad3db94b-c5f9-41f5-967c-5e8165c53ac7" >
+    <http:listener doc:name="/ping" doc:id="2a84d637-3e95-4629-9ec4-2e7928f4bc79" path="/ping"/>
+    <set-payload value="pong" doc:name="Set Payload" doc:id="6ee26bbc-06b0-47c7-bddf-c6948b3f71c2" />
+  </flow>
+</mule>

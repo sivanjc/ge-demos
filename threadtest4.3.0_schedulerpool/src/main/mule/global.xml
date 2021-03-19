@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+  -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd   http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+    <!-- ... -->
+    <global-property name="env" value="dev" doc:name="Default env to dev"/>
+    <!-- 1st def of a property is preserved, so env-dependent takes priority over env-independent -->
+    <configuration-properties file="${env}-properties.yaml" doc:name="Env Config Props"/>
+    <configuration-properties file="properties.yaml" doc:name="Config Props"/>
+    <http:listener-config name="HTTP_Listener_config_8091" doc:name="HTTP Listener config" doc:id="bc4e19f2-9080-4b15-899c-440eff19b2e9">
+        <http:listener-connection host="0.0.0.0" port="8091"/>
+    </http:listener-config>
+    <http:request-config name="HTTP_Request_configuration_8091" doc:name="HTTP Request configuration" doc:id="5f6e4def-1b83-4b37-8692-9f3e8c6429d8">
+        <http:request-connection host="localhost" port="8091"/>
+    </http:request-config>
+    <http:request-config name="HTTP_Request_configuration_8099" doc:name="HTTP Request configuration" doc:id="175738f2-7e38-4a89-aa9d-da9dd0409f54">
+        <http:request-connection host="localhost" port="8099"/>
+    </http:request-config>
+    <http:listener-config name="HTTP_Listener_config_8099" doc:name="HTTP Listener config" doc:id="463ceef2-165e-4e53-bba9-26165bab7371">
+        <http:listener-connection host="0.0.0.0" port="8099"/>
+    </http:listener-config>
+    <ee:scheduler-pools doc:name="Scheduler Pools Configuration" doc:id="18d834fd-bca4-4e13-acf5-6f987dd4379f" gracefulShutdownTimeout="30">
+        <ee:cpu-light poolSize="2" queueSize="1024"/>
+        <ee:io corePoolSize="1" maxPoolSize="2" queueSize="0" keepAlive="30000"/>
+        <ee:cpu-intensive poolSize="4" queueSize="2048"/>
+    </ee:scheduler-pools>
+</mule>

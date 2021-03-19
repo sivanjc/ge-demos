@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+  http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+  
+  <flow name="send-quotes-to-mq-mystock" doc:id="4fd5b7e6-06db-43df-ba13-9cdd08e5bf39" >
+    <anypoint-mq:publish doc:name="Publish" doc:id="e8454126-a257-4f33-a1a4-7bddad93f5f5" config-ref="anypointMQConfig" destination="training-mq" messageId="#[correlationId]" messageGroupId="anypoint-mq-demoFlow" outputMimeType="application/json">
+      <anypoint-mq:properties ><![CDATA[#[output application/java
+---
+{
+	"SendBy" : "application-1"
+}]]]></anypoint-mq:properties>
+    </anypoint-mq:publish>
+  </flow>
+    <flow name="send-quotes-to-nw-stock" doc:id="7af01327-0795-4847-974d-2b60d3c0d251" >
+    <anypoint-mq:publish doc:name="Publish" doc:id="b32b571e-b120-4cbd-adea-86210c45a0cb" config-ref="anypointMQConfig" destination="training-mq" messageId="#[correlationId]" messageGroupId="anypoint-mq-demoFlow" outputMimeType="application/json">
+          <anypoint-mq:properties ><![CDATA[#[output application/java
+---
+{
+  "SendBy" : "application-2"
+}]]]></anypoint-mq:properties>
+    </anypoint-mq:publish>
+  </flow>
+</mule>

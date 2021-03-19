@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:custom-metrics="http://www.mulesoft.org/schema/mule/custom-metrics" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/custom-metrics http://www.mulesoft.org/schema/mule/custom-metrics/current/mule-custom-metrics.xsd">
+  <flow name="generate-mystock-flow" doc:id="aed13e20-2791-47c3-8939-090bc3dc5d07">
+    <scheduler doc:name="Scheduler every 2 seconds" doc:id="3a51ac3e-ecdb-465f-9c18-396e262e952a">
+      <scheduling-strategy>
+        <fixed-frequency frequency="2" timeUnit="SECONDS" />
+      </scheduling-strategy>
+    </scheduler>
+    <set-payload
+      value='#[%dw 2.0&#10;&#10;output application/json&#10;&#10;---&#10;&#10;{&#10;&#10; "stock" : "MYSTOCK",&#10; "price" : (random() * 100 ) as String {format: "0.00"},&#10; "time" : now()&#10;&#10;}]'
+      doc:name="Generate random stoke quotes for MYSTOCK" doc:id="c1b5f3ee-219e-403d-9c32-0bbbe8ae733f" />
+    <ee:transform doc:name="Transform Message" doc:id="3336c46f-c982-4ac3-9572-05e74abb1501">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <flow-ref doc:name="Flow Reference" doc:id="be97031c-ecab-4c60-8a28-792883641414" name="send-custom-metrics-to-anypoint-monitoring"/>
+  </flow>
+  <flow name="send-custom-metrics-to-anypoint-monitoring" doc:id="aeaecb21-9a7e-4e5a-893d-53a2796b363d" >
+    <custom-metrics:send doc:name="Send Custom Metric" doc:id="52429d59-7214-4f75-b03f-d58b66e25418" metricName="stockvalue">
+      <custom-metrics:dimensions >
+        <custom-metrics:dimension dimensionName="Stock_Name" value="#[payload.stock]" />
+      </custom-metrics:dimensions>
+      <custom-metrics:facts >
+        <custom-metrics:fact factName="Stock_Price" value="#[payload.price as Number]" />
+      </custom-metrics:facts>
+    </custom-metrics:send>
+    <logger level="INFO" doc:name="Logger" doc:id="71d6e794-e160-4dcd-9352-1d792c5c494e" message="#[payload.price]"/>
+  </flow>
+</mule>

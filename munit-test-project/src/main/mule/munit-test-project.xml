@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+  xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+  <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config"
+    doc:id="76900c75-890b-4197-9328-c3e4eaa9330a">
+    <http:listener-connection host="0.0.0.0" port="8081" />
+  </http:listener-config>
+  <validation:config name="Validation_Config" doc:name="Validation Config" doc:id="c9c7266e-2719-4b99-b1fe-469f92a4cf9b" i18n="#[attributes.queryParams.key != null]" />
+  <flow name="munit-test-projectFlow" doc:id="6152d994-13a6-4ee2-8dc3-92c6f6f23fb1" >
+    <http:listener doc:name="GET /hello" doc:id="1f98c20d-3558-4051-bbc7-a05f1a492ec6" path="/hello" allowedMethods="GET" config-ref="HTTP_Listener_config" primaryNodeOnly="true"/>
+    <set-payload value="#[{ hello : now()}]" doc:name="Set Payload" doc:id="de89ff56-4d1d-4a5d-b3cb-6b2ea9f51df5" />
+    <ee:transform doc:name="Transform Message" doc:id="dfd8dd3b-de71-4daf-8a15-daeaddfa304f" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+  </flow>
+  <flow name="munit-test-projectFlow1" doc:id="38da5315-16a5-4721-ad44-ee0567fb3182" >
+    <jms:listener doc:id="67a24ce6-18a0-4dc2-9157-bb13528d5f82" />
+    <vm:publish-consume doc:name="Publish consume" doc:id="0145d28c-f6e3-4295-b4c6-1b8dc6bb37e9" />
+  </flow>
+  <flow name="munit-test-projectFlow2" doc:id="6e1f57f5-6f30-4722-9a84-8070a1755b36" >
+    <vm:listener queueName="" doc:id="71884cdd-98d9-4e5a-a039-9916e7a6ea95" />
+    <vm:publish-consume doc:name="Publish consume" doc:id="fb3d0070-d531-424d-890f-bc3faab454a4" />
+  </flow>
+  <flow name="munit-test-projectFlow3" doc:id="0f1ae317-7d95-42be-9861-c5de9776ab45" >
+    <vm:listener doc:name="Listener" doc:id="ea413534-ae60-457c-b9d4-a3e78fcf6702" />
+    <logger level="INFO" doc:name="Logger" doc:id="64771390-e375-4da1-8eac-051c19af3c1f" />
+  </flow>
+</mule>

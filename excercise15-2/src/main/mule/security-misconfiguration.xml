@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+  -->
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:spring="http://www.mulesoft.org/schema/mule/spring" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="51563c17-1049-4fac-9c44-1e2bb86bd509">
+        <http:listener-connection host="0.0.0.0" port="8081"/>
+    </http:listener-config>
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="464e4332-5acc-4c66-828f-d4c1a813ee42">
+        <db:my-sql-connection host="localhost" port="3306" user="root" password="password" database="training"/>
+    </db:config>
+    <configuration-properties doc:name="Configuration properties" doc:id="28085b2d-7896-465c-9e82-b321f3a7425d" file="config.yaml"/>
+    <flow name="security-misconfigurationFlow" doc:id="0ce78474-c1ed-42aa-8f86-665d853400ba">
+        <http:listener doc:name="Listener" doc:id="135f783e-6978-4809-8edb-747f2459b5cd" config-ref="HTTP_Listener_config" path="index" allowedMethods="GET"/>
+        <http:basic-security-filter doc:name="Basic security filter" doc:id="15f86ec8-19dc-4c61-b6f3-399d71285c93" realm="mule"/>
+    <spring:authorization-filter doc:id="9b2083b0-c75c-4fc1-b812-f9298220b438" doc:name="" requiredAuthorities="ROLE_ADMIN"/>
+        <validation:is-true doc:name="Is true" doc:id="66561a61-474d-42b0-adc7-b720dc5f6347" />
+    <db:select doc:name="Select" doc:id="54f370ee-d578-4f53-beb7-125d83dacdec" config-ref="Database_Config">
+            <db:sql><![CDATA[select username, password from users]]></db:sql>
+      <db:input-parameters ><![CDATA[{ useres : payload.user }]]></db:input-parameters>
+        
+</db:select>
+        <ee:transform doc:name="Transform Message" doc:id="ef3ebc3c-1f33-432b-b5b1-2eb430a1a4b6">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) ->{ 
+	"user" : payload01.user,
+	"password" : payload01.password
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    <error-handler >
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="55517750-f369-4924-a65b-c41fa4e95cdd" >
+        <set-payload value="#[payload]" doc:name="Set Payload" doc:id="a78c06f1-d8c9-4b03-b767-84cd2e0f68d6" />
+      </on-error-propagate>
+    </error-handler>
+    
+</flow>
+</mule>

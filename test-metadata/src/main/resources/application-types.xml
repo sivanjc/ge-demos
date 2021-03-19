@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="flights" format="json">
+      <types:shape format="weave" example="examples/flight-example.json"><![CDATA[%dw 2.0
+
+type flights = {|
+  airline: String, 
+  flightCode: String, 
+  fromAirportCode: String, 
+  toAirportCode: String, 
+  departureDate: String, 
+  emptySeats: Number {"typeId": "int"}, 
+  totalSeats: Number {"typeId": "int"}, 
+  price: Number {"typeId": "int"}, 
+  planeType: String
+|} {"example": "{\\\"airline\\\":\\\"United\\\",\\\"flightCode\\\":\\\"ER38sd\\\",\\\"fromAirportCode\\\":\\\"LAX\\\",\\\"toAirportCode\\\":\\\"SFO\\\",\\\"departureDate\\\":\\\"May 21, 2016\\\",\\\"emptySeats\\\":0,\\\"totalSeats\\\":200,\\\"price\\\":199,\\\"planeType\\\":\\\"Boeing 737\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="accounts" format="json">
+      <types:shape format="weave" example="examples/accounts.json"><![CDATA[%dw 2.0
+
+type accounts = Array<{|  accountID: Number {"typeId": "int"},   country: String,   street: String,   state: String,   name: String,   city: String,   postal: String|}> {"example": "[{\\\"accountID\\\":5039,\\\"country\\\":\\\"United States\\\",\\\"street\\\":\\\"77 Geary Street\\\",\\\"state\\\":\\\"California\\\",\\\"name\\\":\\\"Maxine Mule\\\",\\\"city\\\":\\\"San Francisco\\\",\\\"postal\\\":\\\"94108\\\"},{\\\"accountID\\\":5043,\\\"country\\\":\\\"United States\\\",\\\"street\\\":\\\"77 Geary Street\\\",\\\"state\\\":\\\"California\\\",\\\"name\\\":\\\"Max Mule\\\",\\\"city\\\":\\\"San Francisco\\\",\\\"postal\\\":\\\"94108\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="ffd" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="cpy" format="copybook">
+      <types:shape format="copybook" element="RCB-RECORD" location="schemas/RCBFD.ffd"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#b3b2c06e-9bbd-4c33-8e15-faa88f413f66">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cpy"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="accounts"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

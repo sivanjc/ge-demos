@@ -1,0 +1,37 @@
+{
+  "configs": [
+    "inbound-config.xml",
+    "outbound-config.xml",
+    "http-proxy.xml"
+  ],
+  "secureProperties": [
+    "inbound.keystore.password",
+    "inbound.keystore.keyPassword",
+    "inbound.truststore.password",
+    "outbound.keystore.password",
+    "outbound.keystore.keyPassword",
+    "outbound.truststore.password",
+    "anypoint.platform.client_secret"
+  ],
+  "redeploymentEnabled": true,
+  "name": "org.mule.examples:api-gateway-sample-rest-proxy:3.1.0",
+  "minMuleVersion": "4.1.1",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "com/mulesoft/anypoint/gw/datatypes/LineItemDataType.raml",
+        "com/mulesoft/anypoint/gw/examples/OrderExample.raml",
+        "com/mulesoft/anypoint/gw/examples/OrdersExample.raml",
+        "com/mulesoft/anypoint/gw/order-api.raml",
+        "config.properties"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

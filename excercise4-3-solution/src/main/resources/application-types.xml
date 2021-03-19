@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+  -->
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+    <types:catalog>
+        <types:type name="Sales" format="csv">
+            <types:shape format="weave" example="examples/1000 Sales Records.csv"><![CDATA[%dw 2.0
+
+type Sales = Array<{|  Region: String,   Country: String,   "Item Type": String,   "Sales Channel": String,   "Order Priority": String,   "Order Date": String,   "Order ID": String,   "Ship Date": String,   "Units Sold": String,   "Unit Price": String,   "Unit Cost": String,   "Total Revenue": String,   "Total Cost": String,   "Total Profit": String|}> {"isQuotedString": "false",
+"header": "true",
+"headerLineNumber": "0",
+"separator": ","}
+
+]]></types:shape>
+            <types:properties>
+                <types:property name="headerLineNumber" value="0"/>
+                <types:property name="header" value="true"/>
+                <types:property name="isQuotedString" value="false"/>
+                <types:property name="separator" value=","/>
+            </types:properties>
+        </types:type>
+    </types:catalog>
+    <types:enrichment select="#bad79b43-4348-4308-bac0-7cae0a73badb">
+        <types:processor-declaration>
+            <types:output-event>
+                <types:message>
+                    <types:payload type="Sales"/>
+                </types:message>
+            </types:output-event>
+        </types:processor-declaration>
+    </types:enrichment>
+    <types:enrichment select="#1968ac45-f5c4-4126-bdf6-d6c34068d35d">
+        <types:processor-declaration>
+            <types:output-event>
+                <types:message>
+                    <types:payload type="Sales"/>
+                </types:message>
+            </types:output-event>
+        </types:processor-declaration>
+    </types:enrichment>
+</types:mule>

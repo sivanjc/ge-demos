@@ -1,0 +1,25 @@
+{
+  "flights": [
+    {
+      "origin": "SFO",
+      "destination": "SYD",
+      "flightNumber": "AC-571",
+      "seatInfo": "No seat info available",
+      "ticketPrice": 643.08
+    },
+    {
+      "origin": "SFO",
+      "destination": "SYD",
+      "flightNumber": "UA-8702",
+      "seatInfo": "46G",
+      "ticketPrice": 819.49
+    },
+    {
+      "origin": "SFO",
+      "destination": "SYD",
+      "flightNumber": "QF-74",
+      "seatInfo": "No seat info available",
+      "ticketPrice": 1150.64
+    }
+  ]
+}

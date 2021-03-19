@@ -1,0 +1,67 @@
+[
+    {
+        "origin": "SFO",
+        "destination": "SYD",
+        "flightNumber": "AC-571"
+    },
+    {
+        "origin": "SFO",
+        "destination": "SYD",
+        "flightNumber": "UA-8702"
+    },
+    {
+        "origin": "SFO",
+        "destination": "SYD",
+        "flightNumber": "QF-74"
+    },
+    {
+        "origin": "SFO",
+        "destination": "MOW",
+        "flightNumber": "TK-80"
+    },
+    {
+        "origin": "SFO",
+        "destination": "MOW",
+        "flightNumber": "LF-455"
+    },
+    {
+        "origin": "SFO",
+        "destination": "HKG",
+        "flightNumber": "CA-3"
+    },
+    {
+        "origin": "SFO",
+        "destination": "HKG",
+        "flightNumber": "DL-4736"
+    },
+    {
+        "origin": "BUE",
+        "destination": "SYD",
+        "flightNumber": "TK-312"
+    },
+    {
+        "origin": "BUE",
+        "destination": "SYD",
+        "flightNumber": "QF-28"
+    },
+    {
+        "origin": "BUE",
+        "destination": "SYD",
+        "flightNumber": "AA-2222"
+    },
+    {
+        "origin": "BUE",
+        "destination": "MOW",
+        "flightNumber": "DL-4736"
+    },
+    {
+        "origin": "BUE",
+        "destination": "HKG",
+        "flightNumber": "AC-93"
+    },
+    {
+        "origin": "BUE",
+        "destination": "HKG",
+        "flightNumber": "NZ-87"
+    }
+]

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+  <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="9492ea0b-aabe-4994-88a9-ba0eb9cb74eb" >
+    <http:request-connection host="127.0.0.1" port="9000" />
+  </http:request-config>
+  <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c64fcb31-2ca1-412c-87c9-0c7d8d25c67f" >
+    <http:listener-connection host="0.0.0.0" port="9000" />
+  </http:listener-config>
+  <vm:config name="VM_Config" doc:name="VM Config" doc:id="49eaaba2-c379-44a4-b17a-63d615942f7e" >
+    <vm:queues >
+      <vm:queue queueName="test" queueType="PERSISTENT" />
+    </vm:queues>
+  </vm:config>
+  <flow name="mule-threadsFlow" doc:id="91bb3844-15f0-45c3-a1ac-58bb0dc7b11f" >
+    <scheduler doc:name="Scheduler" doc:id="c01762ff-82c4-427c-8996-9818bcbfd9f6" >
+      <scheduling-strategy >
+        <fixed-frequency frequency="100"/>
+      </scheduling-strategy>
+    </scheduler>
+    <logger level="INFO" doc:name="Logger" doc:id="d8ce4e80-1352-4b0a-b56a-2cff6aa9fb43" message="before dataweave"/>
+    <http:request method="GET" doc:name="Request" doc:id="1cf56ec4-0abf-4c5d-bac7-b89296a086c0" config-ref="HTTP_Request_configuration" path="/hello"/>
+    <ee:transform doc:name="Transform Message" doc:id="04dd75dd-ace2-41b0-a804-22c4c38cc4b3" >
+      <ee:message >
+        <ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+{ "user" : 1 } wait 60000]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="Logger" doc:id="3bb56d12-8b7f-4b18-8c9a-20c8893b88c7" message="after dataweave"/>
+  </flow>
+  <flow name="mule-threadsFlow1" doc:id="99a2781f-9388-4494-b36d-a42bd36466eb" >
+    <http:listener doc:name="/hello" doc:id="2f8aa32f-d1f4-4bb5-b97b-18614b24833b" config-ref="HTTP_Listener_config" path="/hello"/>
+    <logger level="INFO" doc:name="Logger" doc:id="566dce8c-66c7-4d73-bac1-ad6ce566f1ef" />
+  </flow>
+  <flow name="mule-threadsFlow2" doc:id="de7fa48a-99a9-4633-881b-d8a3764db6eb" >
+    <file:read doc:id="2db6e6b2-f035-4ff5-83e3-cb7523ba6a01" outputMimeType="application/octet-stream">
+      <non-repeatable-stream />
+    </file:read>
+    <async doc:name="Async" doc:id="0742f06e-972a-433d-95c9-cdb76e1150b1" >
+      <logger level="INFO" doc:name="Logger" doc:id="b8f7d014-0f87-4a58-b60c-839b4dfa66ea" />
+      <vm:publish queueName="" doc:id="a4f883b4-39d2-4f2f-a587-c89abaf4962c" />
+    </async>
+    <ee:transform doc:name="Transform Message" doc:id="08606a8f-f66d-405f-a7b1-a2b5aace8349">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <foreach doc:name="For Each" doc:id="f38f1be4-6c94-4d03-9694-c6e4365fc78c" batchSize="10000">
+      <file:write doc:name="Write" doc:id="e2a34513-e6e1-4a0e-83c1-a270c42400c3" />
+    </foreach>
+    <logger level="INFO" doc:name="Logger" doc:id="e03e3f84-4c3c-4565-af76-a2b08f7bb24c" />
+  </flow>
+  <flow name="mule-threadsFlow4" doc:id="e77f5b9c-76b4-4d79-bf9f-10c81f6cfdb8" >
+    <vm:listener doc:name="Listener" doc:id="d7dda28d-3cb4-4887-a0a5-1ec89825256e" />
+    <http:request method="GET" doc:name="Request" doc:id="47d6fb8d-e473-43e0-80d9-b99271b365b8" />
+  </flow>
+  <flow name="mule-threadsFlow3" doc:id="a07c276a-2703-4f97-9992-954fbd91fbb6" >
+    <db:select doc:id="a9a7ceef-59ad-4f5c-abcf-2ba6127da583" >
+      <repeatable-in-memory-iterable />
+    </db:select>
+  </flow>
+  <flow name="mule-threadsFlow5" doc:id="df99d240-ee84-468e-82e8-5ead22a58505" >
+    <vm:publish doc:name="Publish" doc:id="cb10eb29-3b16-4dd8-bff4-969537b4e144" config-ref="VM_Config" queueName="test"/>
+  </flow>
+  <flow name="mule-threadsFlow7" doc:id="87d94b8c-481a-497e-89e7-eb8f71c9e513" >
+    <scheduler doc:name="Scheduler" doc:id="017d1dff-c690-4cef-ad47-340e1042efd3" >
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </scheduler>
+    <anypoint-mq:publish doc:name="Publish" doc:id="c0ae1e02-bd0a-4a54-a026-6121d056b2d8" />
+  </flow>
+  <flow name="mule-threadsFlow6" doc:id="26857875-8911-4125-9627-7c57f9d21531" >
+    <vm:listener doc:name="Listener" doc:id="30a73f9b-035f-4b31-9443-9dfd92b86c04" config-ref="VM_Config" queueName="test"/>
+    <idempotent-message-validator doc:name="Idempotent Message Validator" doc:id="fa01657e-b195-481f-9221-e7621f2f6236" />
+    <vm:publish doc:name="Publish" doc:id="32957687-cc40-48cb-8738-6029187f2f56" config-ref="VM_Config"/>
+  </flow>
+  <flow name="mule-threadsFlow11" doc:id="ede02933-1476-4c6c-9225-08b478c0d65a" >
+    <anypoint-mq:publish doc:name="Publish" doc:id="b68b352d-f43c-4aa4-93fa-20dcf7ecca8a" />
+  </flow>
+  <flow name="mule-threadsFlow12" doc:id="a8756ede-95ce-440e-8405-4c599f049413" >
+    <anypoint-mq:consume doc:name="Consume" doc:id="00748923-354a-4b42-b6f3-84141a8f4072" acknowledgementMode="MANUAL"/>
+    <anypoint-mq:ack doc:name="Ack" doc:id="207fa81c-64d6-448f-b315-3678191c547b" />
+  </flow>
+  <flow name="mule-threadsFlow10" doc:id="b15c7500-c359-4c18-94f2-3757fedc1cb9" >
+    <jms:listener doc:name="On New Message" doc:id="90ce0561-5fac-4d68-af3b-4e8c7a3866c2" />
+  </flow>
+  <flow name="mule-threadsFlow14" doc:id="6561dcf9-37af-4a19-b11a-36c372a61b73" >
+    <foreach doc:name="For Each" doc:id="f9171479-c4e5-4521-95dc-4369c08035ca" batchSize="100">
+      <salesforce:upsert doc:name="Upsert" doc:id="9070b99a-f3fd-4512-942a-ab1daad67b4c" />
+    </foreach>
+  </flow>
+  <flow name="mule-threadsFlow13" doc:id="c6e0229f-97d6-4e8d-9f35-efab51b19bcf" >
+    <parallel-foreach doc:name="Parallel For Each" doc:id="b85add74-b1e0-4c02-95f8-c92f7cbfb8b5" />
+  </flow>
+  <flow name="mule-threadsFlow8" doc:id="aa25ad25-4f16-4981-9e48-4c024a2641d5" >
+    <vm:publish-consume queueName="test" doc:name="Publish consume" doc:id="03c5abe0-4550-418e-857d-8583455fc44a" config-ref="VM_Config"/>
+  </flow>
+  <flow name="mule-threadsFlow9" doc:id="340e6bf9-2fc6-41c3-a604-e3aa1ca91871" >
+    <jms:publish-consume doc:name="Publish consume" doc:id="31c74fc2-796f-4430-b9e0-9797cd559db4" />
+  </flow>
+  <flow name="mule-threadsFlow15" doc:id="3fad5f93-08f1-46fd-a488-2b69e86c2ec9" maxConcurrency="1">
+    <set-payload value="#[payload]" doc:name="Set Payload 1000" doc:id="9c1ab040-55c6-4e85-ba5d-5266186dee23" />
+    <batch:job jobName="mule-threadsBatch_Job" doc:id="0b9152cf-1487-4a52-96a4-1e8d16f29cf0" maxConcurrency="1">
+      <batch:process-records >
+        <batch:step name="Batch_Step" doc:id="b50f1fa6-747f-463f-94dd-d50129eb0fbb" acceptExpression=" sizeOf(10)">
+          <batch:aggregator doc:name="Batch Aggregator" doc:id="1b2ebee0-2ab4-4484-b8c9-b0eb7a48641a">
+            <file:write doc:name="Write" doc:id="4816c8c3-70b5-4b23-a7a1-099d76893ec2" />
+          </batch:aggregator>
+        </batch:step>
+        <batch:step name="Batch_Step1" doc:id="5687cdc9-65c2-4e00-9bab-1dc701a50e91" />
+      </batch:process-records>
+    </batch:job>
+  </flow>
+</mule>

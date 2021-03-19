@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+  -->
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+    <types:catalog>
+        <types:type name="leads" format="json">
+            <types:shape format="weave" example="examples/leads.json"><![CDATA[%dw 2.0
+
+type leads = Array<{|  leadId: Number {"typeId": "int"},   company: String,   firstName: String,   lastName: String,   birthday: String,   email: String|}> {"example": "[{\\\"leadId\\\":1,\\\"company\\\":\\\"Aliquam Tincidunt Nunc LLC\\\",\\\"firstName\\\":\\\"Ishmael\\\",\\\"lastName\\\":\\\"Alexander\\\",\\\"birthday\\\":\\\"3\\/8\\/2014\\\",\\\"email\\\":\\\"faucibus@egetmetus.org\\\"},{\\\"leadId\\\":2,\\\"company\\\":\\\"Aliquam Tincidunt Nunc LLC\\\",\\\"firstName\\\":\\\"Ishmael\\\",\\\"lastName\\\":\\\"Alexander\\\",\\\"birthday\\\":\\\"3\\/8\\/2014\\\",\\\"email\\\":\\\"faucibus@egetmetus.org\\\"}]"}
+
+]]></types:shape>
+        </types:type>
+        <types:type name="lastleadId" format="java">
+            <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: number]]></types:shape>
+        </types:type>
+    </types:catalog>
+    <types:enrichment select="#b8b977e7-278b-44d5-8496-06c36ecb759c">
+        <types:operation-declaration>
+            <types:inputs>
+                <types:parameter name="value" type="lastleadId"/>
+            </types:inputs>
+        </types:operation-declaration>
+    </types:enrichment>
+</types:mule>

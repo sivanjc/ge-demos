@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+  <flow name="reliabilityFlow1" doc:id="b60ae9b6-8a3c-4d1a-b1de-4679e23f7bf0" >
+    <until-successful maxRetries="5" doc:name="Until Successful" doc:id="2e052fe4-cd14-41c5-beb3-1c50a6ab2b39" />
+  </flow>
+  <flow name="reliabilityFlow" doc:id="b6123489-de81-4fa3-9e70-88392f2c8cdb" >
+    <http:listener doc:name="Listener" doc:id="5f098485-b996-441b-9890-f3a39e724877" />
+    <os:retrieve doc:name="Retrieve state open or fail" doc:id="7882e9e9-381f-4197-86d9-67d9b54ec882" />
+    <choice doc:name="Choice" doc:id="3d4da469-1b23-48b9-a7c5-d00d23b01d21" >
+      <when expression="open">
+        <db:insert doc:id="76efb97e-2e3a-49b4-8fe8-7f2f7831e641" />
+      </when>
+    </choice>
+    <error-handler >
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6f8e3473-dcef-4758-a5dd-1afb3ae1879c" >
+        <os:store doc:id="42ae96a2-527f-47d7-abdd-9616b603980c" doc:name="Store fail"/>
+        <jms:publish doc:name="Publish to DLQ" doc:id="e5470cfc-1cea-4750-825d-2fbafb35430e" />
+      </on-error-propagate>
+    </error-handler>
+  </flow>
+  <flow name="reliabilityFlow2" doc:id="239caf08-3db9-4a30-942e-7c97c00f37e0" >
+    <jms:listener doc:name="On New Message" doc:id="d6a50085-b7ef-470a-9208-4384a1bbc131" />
+    <flow-ref doc:name="Flow Reference Recon Job" doc:id="ad60e39d-2d9f-43be-be5e-453667c51f33" />
+  </flow>
+</mule>

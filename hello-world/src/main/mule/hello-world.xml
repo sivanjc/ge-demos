@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="httpConfig" doc:name="HTTP Listener config" doc:id="d6132ed6-b549-4a5a-ab30-b0006362476b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="hello-world-business-flow" doc:id="fb709ee4-0263-492c-92e3-ba5bb6287cd7" doc:description="This flow works on such and such end points..&#10;">
+		<http:listener doc:name="GET /world" doc:id="b4f5d981-3869-46e4-879b-2ba9e8e1c2b7" config-ref="httpConfig" path="/world" doc:description="This is a http node, payload... details.."/>
+		<logger level="INFO" doc:name="Entry Logger" doc:id="d254b372-8ea9-4b59-bb07-04cc2bf715a5" message="#[attributes.requestPath]" category="com.ge.hello-world.hello-world-business-flow.entry-logger"/>
+		<set-payload value="Hello World!" doc:name="Set Payload" doc:id="c04ac342-40dd-48ec-bf80-206d3aaa77e3" mimeType="text/plain"/>
+    <logger level="INFO" doc:name="Exit Logger" doc:id="fe903724-3bd5-4e41-9555-4fc5f4f3b3c4" message="#[now()]" category="com.ge.hello-world.hello-world-business-flow.entry-logger"/>
+	
+</flow>
+  <flow name="hello-worldFlow" doc:id="bbcf84ee-4b88-44eb-9567-d8b297ab0813" >
+    <http:listener doc:name="Listener" doc:id="b4eea2b5-4917-4ffd-9d84-4f5810e65455" config-ref="httpConfig"/>
+    <logger level="INFO" doc:name="Logger" doc:id="c854c2cd-1c01-4c8e-8f81-efcf74e16acc" />
+    <os:store doc:id="8973e284-1b25-46bd-8bf4-89fcc5d2cf8d" />
+    <async doc:name="Async" doc:id="7cd26525-ec82-473b-8414-9883935ac970" >
+      <logger level="INFO" doc:name="Logger" doc:id="9e9bf85e-4a30-45ac-9c17-d11cd4d01054" />
+      <try doc:name="Try" doc:id="7c9073ac-9c9a-4acd-bb4c-5b8cf028e9f7" />
+      <http:request method="GET" doc:name="Request" doc:id="8576abcd-05f1-4c2e-b779-1223345c4029" />
+      <flow-ref doc:name="call some process" doc:id="93a946db-0190-47ff-9ade-78f32cd39a4c" name="hello-worldFlow"/>
+      <logger level="INFO" doc:name="Logger" doc:id="134092c2-bbde-4e32-ae20-29028296175c" />
+    </async>
+    <logger level="INFO" doc:name="Logger" doc:id="d5fe2670-a8aa-45d8-9f33-cd96e8206c80" />
+  </flow>
+  <flow name="hello-worldFlow1" doc:id="9d15fb30-6cc3-42ce-8e6f-f7c29f7cc66a" >
+  </flow>
+
+</mule>

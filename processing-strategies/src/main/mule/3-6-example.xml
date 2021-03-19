@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+  <flow name="3-6-exampleFlow" doc:id="58f9026b-b69f-4534-a9f3-3f0d99853fed" >
+    <http:request method="GET" doc:name="Request" doc:id="84c484d4-b4fb-4570-b47f-b984dfa4b2b2" />
+    <validation:is-true doc:id="936ec4ec-f0c4-4cc0-bdc0-0167e59e41da" />
+    <http:request method="GET" doc:name="Request" doc:id="008db5b7-c229-4adb-ab61-e85e58485e35" />
+  </flow>
+</mule>

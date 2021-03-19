@@ -1,0 +1,10 @@
+<metadata>
+    <groupId>com.mulesoft.training.mcial1</groupId>
+    <artifactId>solutions-parent-pom</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <versioning>
+        <versions>
+            <version>1.0.0-SNAPSHOT</version>
+        </versions>
+    </versioning>
+</metadata>

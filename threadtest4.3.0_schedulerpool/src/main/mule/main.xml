@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+-->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd  http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd  http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+    <!-- ... -->
+    <flow name="threads-flow" doc:id="7d610e0e-9b60-41d3-9201-62f4e53b82fb" initialState="started">
+        <scheduler doc:name="Scheduler" doc:id="3e3b0c1a-3742-4b32-b7d7-ba8ed2575ddc">
+            <scheduling-strategy>
+                <fixed-frequency frequency="100"/>
+            </scheduling-strategy>
+        </scheduler>
+        <set-payload value="#[%dw 2.0 output applicaiton/java  var objects = [   {     &quot;msg&quot;: &quot;Hello&quot;   },   {     &quot;msg2&quot;: &quot;hello&quot;   },   {     &quot;toUpper&quot;: &quot;hELLO&quot;   },   {     &quot;combined&quot;: &quot;HELLO WORLD&quot;   },   {     &quot;combined2&quot;: &quot;hello world today&quot;   } ] --- objects]" doc:name="Set Payload" doc:id="afd49f45-4526-45bb-aa2d-8ef3075c53d9"/>
+        <ee:transform doc:name="Transform Message" doc:id="e0fb4b27-c951-4a3c-b23a-a77385b39859">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+{ payload : "after wait" } wait 10000]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="threads-flow-http" doc:id="60d03ea9-e940-4a7f-86c7-83f2021c17ec">
+        <http:listener doc:name="Listener" doc:id="eb89d27b-d530-4429-9a5e-fe0e9460ca16" config-ref="HTTP_Listener_config_8091" path="/threadTest"/>
+        <set-payload value="#[%dw 2.0 output applicaiton/java  var objects = [   {     &quot;msg&quot;: &quot;Hello&quot;   },   {     &quot;msg2&quot;: &quot;hello&quot;   },   {     &quot;toUpper&quot;: &quot;hELLO&quot;   },   {     &quot;combined&quot;: &quot;HELLO WORLD&quot;   },   {     &quot;combined2&quot;: &quot;hello world today&quot;   } ] --- objects]" doc:name="Set Payload" doc:id="17b14fec-0b3c-4911-a9bf-37f839f6eda2"/>
+        <http:request method="GET" doc:name="FirstHTTPRequest" doc:id="a4a30008-9e6f-45a3-8388-789fce76ba93" config-ref="HTTP_Request_configuration_8091" path="/callSubFlow1"/>
+        <http:request method="GET" doc:name="SecondHTTPRequest" doc:id="21ec6f67-a9d8-4418-ae0f-08d2e738b24a" config-ref="HTTP_Request_configuration_8099" path="/callSubFlow2"/>
+    </flow>
+    <flow name="threadTest-subFlow1" doc:id="07e006c8-ed1f-4572-9aa0-9fcb38cb7b89">
+        <http:listener doc:name="Listener" doc:id="61373b8f-05e5-41c0-a95c-57c104032b04" config-ref="HTTP_Listener_config_8091" path="/callSubFlow1"/>
+        <ee:transform doc:name="Transform Message" doc:id="49a135da-37f1-40f4-80a3-49c933c892f8">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+'response from subFlow1']]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="threadTest-subFlow2" doc:id="d3ce7d80-f328-4538-994c-f4b94ad75db2">
+        <http:listener doc:name="Listener" doc:id="cc2a2dcc-d967-4af2-bd2a-05b226f4020c" config-ref="HTTP_Listener_config_8099" path="/callSubFlow2"/>
+        <ee:transform doc:name="Transform Message" doc:id="462bb9da-8de3-4306-80df-20c26957727f">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+'response from subFlow2']]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

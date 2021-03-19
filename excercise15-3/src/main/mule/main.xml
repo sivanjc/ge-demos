@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+-->
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd  http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd  http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+    <!-- ... -->
+    <flow name="security-misconfigurationFlow" doc:id="43d5b1f9-52ee-41c6-869a-217e0891208c">
+        <http:listener doc:name="Listener" doc:id="0395057e-765a-4d07-9a0d-12bbc6ebc379" config-ref="apiHttpListenerConfig" path="index" allowedMethods="GET"/>
+        <logger level="INFO" doc:name="Logger" doc:id="5e6a841e-eaee-49c2-a7d8-ec478291b2b1" message="#[p('secure::db.password')]"/>
+        <validation:is-true doc:name="Is true" doc:id="e6ce7591-d573-443c-bd46-3700c401a2bd" />
+    <db:select doc:name="Select" doc:id="1d41bfad-b436-4b62-be67-2de94ecb2227" config-ref="Database_Config">
+            <db:sql><![CDATA[select username, password from :users]]></db:sql>
+      <db:input-parameters ><![CDATA[{
+	user : payload.user,
+	password : payload.password
+}]]></db:input-parameters>
+        
+</db:select>
+        <ee:transform doc:name="Transform Message" doc:id="5be3725a-6e0a-4218-8cef-8998c6ba0d81">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) ->{ 
+	"user" : payload01.user,
+	"password" : payload01.password
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    <logger level="INFO" doc:name="Logger" doc:id="336b71d8-7585-4863-ba76-04c41c921e8b" />
+    <error-handler >
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="314d5ad5-6856-43af-adf1-b9767d902682" />
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="78a4496f-82e0-48e1-ac18-f056ebdf57b7" />
+    </error-handler>
+    
+</flow>
+</mule>

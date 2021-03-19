@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+  <flow name="generate-mystock-flow" doc:id="da77cf90-ebc1-4cfb-b98f-6f36ba8c1a1a">
+    <scheduler doc:name="Scheduler every 2 seconds" doc:id="42e96c8c-b2b9-418f-9590-8bacec44c623">
+      <scheduling-strategy>
+        <fixed-frequency frequency="2" timeUnit="SECONDS" />
+      </scheduling-strategy>
+    </scheduler>
+    <set-payload
+      value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"stock" : "MYSTOCK",&#10;	"price" : (random() * 100 ) as String {format: "0.00"},&#10;	"time" : now()&#10;}]'
+      doc:name="Generate random stoke quotes for MYSTOCK" doc:id="dcb202cd-fde4-4189-8ff0-eae4bc0e7168" />
+    <ee:transform doc:name="Transform Message" doc:id="a5ca628c-59a9-4944-b543-24afd0631636">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <flow-ref doc:name="send-quotes-to-mq-mystock" doc:id="7cde6068-1a3f-419b-9f42-440d7682e889" name="send-quotes-to-mq-mystock" />
+  </flow>
+    <flow name="generate-nwstock-flow" doc:id="45657fdd-b32e-43af-aa00-079826a9a2fd">
+    <scheduler doc:name="Scheduler every 2 seconds" doc:id="37e1e9cc-b3e5-4cdf-bfde-299a9c730084">
+      <scheduling-strategy>
+        <fixed-frequency frequency="2" timeUnit="SECONDS" />
+      </scheduling-strategy>
+    </scheduler>
+    <set-payload
+      value='#[%dw 2.0&#10;&#10;output application/json&#10;&#10;---&#10;&#10;{&#10;&#10; "stock" : "NWSTOCK",&#10;&#10; "price" : (random() * 1000 ) as String {format: "0.00"},&#10;&#10; "time" : now()&#10;&#10;}]'
+      doc:name="Generate random stoke quotes for NWSTOCK" doc:id="077daa1c-ea20-410d-9396-04a09d6587ad" />
+    <ee:transform doc:name="Transform Message" doc:id="7bb44feb-177e-4ca2-90e5-585a2011fde2">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <flow-ref doc:name="send-quotes-to-mq-flow" doc:id="a69f1eb4-a074-40f6-9548-d6d193a21b7c" name="send-quotes-to-nw-stock" />
+  </flow>
+</mule>

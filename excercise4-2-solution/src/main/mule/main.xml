@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+-->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd  http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd  http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+    <!-- ... -->
+    <flow name="syncDbToSalesforce" doc:id="222935fc-9bdb-420c-adca-b4ecf6171d51">
+        <db:listener doc:name="On Table Row" doc:id="edd96951-7b1f-4495-b12f-5a326005682a" config-ref="Database_Config" table="leads" watermarkColumn="leadId" idColumn="leadId">
+            <scheduling-strategy>
+                <fixed-frequency/>
+            </scheduling-strategy>
+        </db:listener>
+        <logger level="INFO" doc:name="Logger" doc:id="b8b6b9ca-b6e0-4b48-b585-a1043c30d7e9"/>
+        <ee:transform doc:name="Transform Message" doc:id="64d9a002-84fc-4e3e-9133-bd4e82e27dce">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+ [{
+	Company    : payload.company,
+	Email      : payload.email,
+	FirstName  : payload.firstName,
+	LastName   : payload.lastName
+}]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <salesforce:create type="Lead" doc:name="Insert Lead" doc:id="2094c8f2-461e-4a58-9dd9-0c3535a654e4" config-ref="Salesforce_Config"/>
+    </flow>
+    <flow name="import-leads-into-salesforceFlow" initialState="stopped">
+        <scheduler doc:name="Scheduler" doc:id="7cebb65b-6605-4652-8468-b7b8d5a8e567">
+            <scheduling-strategy>
+                <fixed-frequency frequency="90000"/>
+            </scheduling-strategy>
+        </scheduler>
+        <os:retrieve doc:name="lastleadId" doc:id="08ba65a8-c0c3-44bd-a04c-8e2c77472f32" key="lastleadId" target="lastleadId" objectStore="Object_store">
+            <os:default-value><![CDATA[0]]></os:default-value>
+        </os:retrieve>
+        <db:select doc:name="leads" doc:id="60fd3de7-7088-444c-9333-4aea9319bfec" config-ref="Database_Config" targetValue="#[output application/json --- payload]">
+            <db:sql><![CDATA[SELECT * FROM leads WHERE leadId > :lastleadId]]></db:sql>
+            <db:input-parameters><![CDATA[#[{lastleadId: vars.lastleadId}]]]></db:input-parameters>
+        </db:select>
+        <choice doc:name="Choice" doc:id="9b72a75f-c421-4d84-bc61-0901f61d6b2b">
+            <when expression="#[not isEmpty(payload)]">
+                <os:store doc:name="lastleadId" doc:id="b8b977e7-278b-44d5-8496-06c36ecb759c" key="lastleadId" objectStore="Object_store">
+                    <os:value><![CDATA[#[max(payload map $.leadId)]]]></os:value>
+                </os:store>
+                <ee:transform doc:name="Transform Message" doc:id="689028a1-d6f1-498c-af3f-1cd9f0c888f8">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload map {
+	Company    : $.company,
+	Email      : $.email,
+	FirstName  : $.firstName,
+	LastName   : $.lastName
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <batch:job jobName="CreateLeadsBatch" doc:id="7f8f2d33-2e3d-4fb3-99c0-34288ed25245" maxFailedRecords="1000">
+                    <batch:process-records>
+                        <batch:step name="LeadExistsStep" doc:id="ef3c7e30-2a89-4361-9c76-76f7fa848049">
+                            <salesforce:query config-ref="Salesforce_Config" doc:name="Find lead" doc:id="747fc5be-144b-4d6f-ac3c-e87d93d5ca26" target="leadNotFound" targetValue="#[isEmpty(payload)]">
+                                <salesforce:salesforce-query><![CDATA[SELECT Id FROM Lead WHERE Email = ':email']]></salesforce:salesforce-query>
+                                <salesforce:parameters><![CDATA[#[output applicaton/java
+---
+{
+	"email" : payload.Email
+}]]]></salesforce:parameters>
+                            </salesforce:query>
+                        </batch:step>
+                        <batch:step name="LeadInsertStep" doc:id="a7a46814-ab33-4892-8f4a-d695dccbe446" acceptExpression="vars.leadNotFound">
+                            <batch:aggregator doc:name="Batch Aggregator" doc:id="f16f4212-0613-4597-921d-8aa769a3d456" size="200">
+                                <salesforce:create config-ref="Salesforce_Config" type="Lead" doc:name="Insert Lead" doc:id="f2a9b5f9-0480-4f3d-8284-d905f819b76e"/>
+                            </batch:aggregator>
+                        </batch:step>
+                        <batch:step name="LogFailuresStep" doc:id="492ebf31-16f4-4169-b782-0ae0a102155b" acceptPolicy="ONLY_FAILURES">
+                            <jms:publish doc:name="Publish Error Queue(DLQ)" doc:id="174f2bd1-c662-4659-ab23-0e5f3c302f51" config-ref="JMS_Config" destination="DLQ"/>
+                        </batch:step>
+                    </batch:process-records>
+                    <batch:on-complete>
+                        <logger level="INFO" doc:name="Log Results" doc:id="43cf5c6f-fe68-4902-be40-879e592720a8" message="#[payload.loadedRecords ++ ' Loaded Records ' ++ payload.failedRecords ++' Failed Records']"/>
+                    </batch:on-complete>
+                </batch:job>
+            </when>
+            <otherwise>
+                <logger level="INFO" doc:name="No new records" doc:id="c2ea7fa9-0bc3-43c8-8252-211666b2d1b9" message="No new records"/>
+            </otherwise>
+        </choice>
+    </flow>
+</mule>

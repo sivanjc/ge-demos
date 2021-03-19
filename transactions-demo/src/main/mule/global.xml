@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:bti="http://www.mulesoft.org/schema/mule/ee/bti" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/bti http://www.mulesoft.org/schema/mule/ee/bti/current/mule-bti-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+  <bti:transaction-manager doc:name="Bitronix Transaction Manager" doc:id="f0b740d9-ef69-44c6-9630-7d7c2ce85b4b" />
+  <db:config name="Database_Config" doc:name="Database Config" doc:id="9ed32f58-d43e-4bee-8780-6a3e065d0f11" >
+    <db:my-sql-connection useXaTransactions="true" />
+  </db:config>
+  <flow name="globalFlow" doc:id="bdb47f5f-fd58-4660-894a-1644f31c560c" >
+    <jms:listener doc:name="On New Message" doc:id="5b63a274-c6aa-4836-b939-30f30a6c1709" transactionalAction="ALWAYS_BEGIN" transactionType="XA"/>
+    <db:insert doc:name="Insert" doc:id="435fdbc8-de79-4410-84dc-e60e61af0a72" config-ref="Database_Config"/>
+    <vm:publish doc:name="Publish" doc:id="4f7fce5d-ee95-435d-88ec-12741f5c0811" />
+    <jms:consume doc:name="Consume" doc:id="14d456e7-1d5c-4ce7-a677-ceb9c38fda82" />
+    <error-handler >
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue Partial Commit" doc:id="5808ca66-882c-4205-88cc-110f73b069ed" />
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate rOLLBACK" doc:id="6a8d7340-c5bd-41e0-86ed-511b05bb356d" />
+    </error-handler>
+  </flow>
+    <flow name="globalFlow" doc:id="7ab13774-3cc2-4e67-8258-6eae0b128069" >
+    <http:listener doc:name="Listener" doc:id="e3f05845-66d9-41a8-816e-1a437454d3a9" />
+    <try doc:name="Try" doc:id="47ffa4b7-4cef-4277-afe4-82eb69c2fce7" transactionType="XA">
+      <db:insert doc:name="Insert" doc:id="1a018be2-76a4-4809-a916-637c929d3c91" config-ref="Database_Config" />
+      <vm:publish doc:name="Publish" doc:id="0b525f3a-1d82-4bbf-87f8-e61b24f16356" />
+      <jms:consume doc:name="Consume" doc:id="0d9e479a-0594-4eee-8de5-12e599a9a098" />
+      <error-handler >
+        <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f04dd553-7b2b-462e-b512-ea3349f87225" />
+        <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="74284809-a84c-4d18-b891-1360ad92557f" />
+      </error-handler>
+    </try>
+    <error-handler >
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue Partial Commit" doc:id="217e03c6-c6b4-4313-ad53-bd6faa66d8d3" />
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate rOLLBACK" doc:id="ec69052a-a7e9-4cf8-892b-964d7ddcfc93" />
+    </error-handler>
+  </flow>
+</mule>

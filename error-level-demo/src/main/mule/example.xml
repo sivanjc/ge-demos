@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+  <flow name="exampleFlow" doc:id="0e89a69b-c9c3-44ef-b3c5-40ddf9b7036b" >
+    <logger level="DEBUG" doc:name="Logger" doc:id="ee342ad7-dea4-4e15-bd97-83e60de08f55" />
+    <flow-ref doc:name="Flow Reference" doc:id="3389aaa5-27af-4761-9a6d-2c364015c1cd" />
+    <logger level="DEBUG" doc:name="Logger" doc:id="d983ed70-6894-4e9e-b84a-e435c583cd2a" message="#[sizeOf(payload)]"/>
+  </flow>
+</mule>

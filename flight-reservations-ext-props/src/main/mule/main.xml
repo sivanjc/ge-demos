@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  MuleSoft Training - Anypoint Platform Architecture: Integration Solutions
+  %%
+  Copyright (C) 2015 - 2020 MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  %%
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+  #L%
+  -->
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd">
+    <flow name="help" doc:id="d0e67cdc-6757-4ec0-b256-ae173503c043">
+        <http:listener doc:name="Listener" doc:id="26f9c74f-215a-4ad4-a6a8-ce61cf242e8d" config-ref="HTTP_Listener_config" path="/*">
+            <http:response>
+                <http:headers><![CDATA[#[output applicaton/java
+---
+{
+	"content-type" : "text/html"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value="#[output application/java --- 'Available URLs are: &lt;UL&gt; &lt;LI&gt;Load the search form at &lt;A href= /' ++ p(&quot;flight.reservations.url&quot;) ++ '&gt;/' ++ p(&quot;flight.reservations.url&quot;) ++ '&lt;/A&gt;  &lt;LI&gt;Search a flight from origin to destination at &lt;A href= /searchResults?origin=SFO&amp;destination=SYD&gt;/searchResults?origin=SFO&amp;destination=SYD&lt;/A&gt;  &lt;LI&gt;Enrich search results with a PNR by sending a POST to &lt;A href= /' ++ p(&quot;reservations.sabre.baseuri&quot;) ++ '&gt;/' ++ p(&quot;reservations.sabre.baseuri&quot;) ++ '&lt;/A&gt;  &lt;/UL&gt; &lt;P&gt; Set the flight.reservations.url property in the app deployment&amp;apos;s Properties tab to change this.  &lt;P&gt; Set the http.port property  in the app deployment&amp;apos;s Properties tab to change the HTTP port. The current value is  $(p(&quot;http.port&quot;)).  ']" doc:name="Return help HTML page" doc:id="c4e92f4b-46a8-4155-8868-090e706ed2e2"/>
+    </flow>
+    <flow name="setVariablesFlow" doc:id="a08ccd32-aadb-47a4-ad5d-4c359dbc6e5a">
+        <set-variable value="#[attributes.queryParams.origin default &quot;SFO&quot;]" doc:name="origin" doc:id="d6e977c8-0457-416b-abd0-b7bbc023b270" variableName="origin"/>
+        <set-variable value="#[attributes.queryParams.destination default &quot;MOW&quot;]" doc:name="destination" doc:id="47f2c83d-50be-40cf-854c-f86b58deb920" variableName="destination"/>
+    </flow>
+    <flow name="loadIndexFlow" doc:id="54660e0c-30c4-4371-baf1-c5f5a2fa6f15">
+        <http:listener doc:name="Listener" doc:id="101bd69c-fc5c-46ee-bd8c-758fa703a5b5" config-ref="HTTP_Listener_config" path="/${flight.reservations.url}"/>
+        <parse-template doc:name="Parse Template" doc:id="cec83a53-05ce-4d14-b61c-f1245d3780d1" location="docroot/index.html"/>
+    </flow>
+    <flow name="makeReservation" doc:id="352895d6-2e64-43bd-9b51-a736751d612a">
+        <http:listener doc:name="Listener" doc:id="db30eb08-f093-49bf-bd1c-0c1afe29705c" config-ref="HTTP_Listener_config" path="/searchResults"/>
+        <flow-ref doc:name="setVariablesFlow" doc:id="5949a35a-3239-4cbe-a01b-8fd4d402ce4d" name="setVariablesFlow"/>
+        <ee:transform doc:name="Set payload to flightData" doc:id="736b46c8-2ceb-489e-9e81-169edbd4a5ee">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var flightData = 
+[
+    {
+        "origin": "SFO",
+        "destination": "SYD",
+        "flightNumber": "AC-571"
+    },
+    {
+        "origin": "SFO",
+        "destination": "SYD",
+        "flightNumber": "UA-8702"
+    },
+    {
+        "origin": "SFO",
+        "destination": "SYD",
+        "flightNumber": "QF-74"
+    },
+    {
+        "origin": "SFO",
+        "destination": "MOW",
+        "flightNumber": "TK-80"
+    },
+    {
+        "origin": "SFO",
+        "destination": "MOW",
+        "flightNumber": "LF-455"
+    },
+    {
+        "origin": "SFO",
+        "destination": "HKG",
+        "flightNumber": "CA-3"
+    },
+    {
+        "origin": "SFO",
+        "destination": "HKG",
+        "flightNumber": "DL-4736"
+    },
+    {
+        "origin": "BUE",
+        "destination": "SYD",
+        "flightNumber": "TK-312"
+    },
+    {
+        "origin": "BUE",
+        "destination": "SYD",
+        "flightNumber": "QF-28"
+    },
+    {
+        "origin": "BUE",
+        "destination": "SYD",
+        "flightNumber": "AA-2222"
+    },
+    {
+        "origin": "BUE",
+        "destination": "MOW",
+        "flightNumber": "DL-4736"
+    },
+    {
+        "origin": "BUE",
+        "destination": "HKG",
+        "flightNumber": "AC-93"
+    },
+    {
+        "origin": "BUE",
+        "destination": "HKG",
+        "flightNumber": "NZ-87"
+    }
+]
+
+---
+flightData]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <flow-ref doc:name="processReservation" doc:id="3537f287-88cb-4d8a-b77c-ab754cee0346" name="processReservation"/>
+    </flow>
+    <flow name="processReservation" doc:id="a8dbe017-5087-417b-80fc-5c2332233197">
+        <ee:transform doc:name="Set availableFlights var" doc:id="481138e1-1c33-401b-9866-89bcdd848692">
+            <ee:message/>
+            <ee:variables>
+                <ee:set-variable variableName="availableFlights"><![CDATA[%dw 2.0
+output application/json
+
+var charLookup = ['A','B','C','D','E','F','G']
+
+
+/*
+ * Filters flights with given origin and destination
+ */
+fun getFlights(payload, origin, destination) = 
+    payload filter ($.origin == origin and $.destination == destination)
+
+---
+
+getFlights(payload,vars.origin,vars.destination)
+
+]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <set-payload value="#[vars.availableFlights]" doc:name="Set payload to availableFlights var" doc:id="e65b32f4-f9b5-41fd-9250-10770df64c3b"/>
+        <set-variable value="#[output application/json --- []]" doc:name="Init processedFlights var" doc:id="5f3bea85-a866-49a4-bf8f-8b50b48290b8" variableName="processedFlights"/>
+        <set-variable value="#[false]" doc:name="Init seatingErrors var" doc:id="1ac00fb9-a737-4eca-aaa7-f5097831f5aa" variableName="seatingErrors"/>
+        <set-variable value="#[false]" doc:name="Init pricingErrors var" doc:id="4ae33f41-beed-449e-8961-b0d85d588d41" variableName="pricingErrors"/>
+        <set-variable value="#[0 as Number]" doc:name="init totalPrice var" doc:id="06a22269-9380-4017-90b0-89f1acf22619" variableName="totalPrice"/>
+        <foreach doc:name="For Each" doc:id="2136b57f-4711-49b9-811c-f1c73066cc28" collection="vars.availableFlights">
+            <try doc:name="Try" doc:id="3a772382-54e8-48e3-a7ff-ce01e9243969">
+                <flow-ref doc:name="acquireSeatsInfo" doc:id="a3f1a3d6-32ad-45bb-abb7-90c50ec0fc3c" name="acquireSeatsInfo"/>
+                <error-handler>
+                    <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="664b03f0-d414-4e02-a965-ef84e59bc5d2">
+                        <ee:transform doc:name="Error result" doc:id="1a365dc2-972a-4917-b964-c8c13e44db36">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var charLookup = ['A','B','C','D','E','F','G']
+
+/*
+ * Creates a random seat
+ * returns a String
+ */
+fun createRandomSeat() = 
+    using (seatNumber = mod(randomInt(100), 50) + 1)
+    using (seatLetter = charLookup[ mod(randomInt(100),7) as Number ])
+    seatNumber as String ++ seatLetter
+
+/*
+ * Creates a random price
+ * returns a currency type
+ */
+fun createRandomPrice() = 
+    using (max = 2689)
+    using (min = 365)
+    (
+        (randomInt(max + 1 - min) + min * random()) as String {format: "#.00"} as Number
+    )
+
+/*
+ * Filters flights with given origin and destination
+ */
+fun getFlights(payload, origin, destination) = 
+    payload filter ($.origin == origin and $.destination == destination)
+
+/*
+ * Assigns random seats for each given flight
+ */
+fun assignSeat(payload) = 
+using(object = payload)
+(        
+        if (object.flightNumber[-1] == '2')
+            object ++ {seatInfo: createRandomSeat() }
+        else if (object.flightNumber[-1] == '3')
+            //Can raise assertion here and catch it in an Error Handler if we want
+        	object ++ {error: 'flight not available!'}
+        else
+            object ++ {seatInfo: "No seat info available"}
+)
+
+/*
+ * Assigns random ticket prices for each flight in the payload
+ */
+fun assignRandomPrice(payload) =
+    (
+        payload map ((object) ->
+            object ++ {ticketPrice: createRandomPrice() }
+        )
+    )
+---
+using(errorString = "The seat assignment service is offline. Try again later.")
+(
+payload ++ {seatInfo: "Seat assignment service is offline"}
+	
+)]]></ee:set-payload>
+                            </ee:message>
+                            <ee:variables>
+                                <ee:set-variable variableName="seatingErrors"><![CDATA[%dw 2.0
+output application/java
+---
+true]]></ee:set-variable>
+                            </ee:variables>
+                        </ee:transform>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+            <try doc:name="Try" doc:id="aff6012c-105b-48d4-bf2d-cd689c810295">
+                <flow-ref doc:name="acquireFlightPrice" doc:id="068f89e0-de26-417c-b201-6d44686a2eee" name="acquireFlightPrice"/>
+                <error-handler>
+                    <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6fea39a3-18eb-4726-9099-2d749535993a">
+                        <ee:transform doc:name="Error result" doc:id="b9ffa730-8000-4d57-8fa9-4c274dfdeb97">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var charLookup = ['A','B','C','D','E','F','G']
+
+
+/*
+ * Creates a random price
+ * returns a currency type
+ */
+fun createRandomPrice() = 
+    using (max = 2689)
+    using (min = 365)
+    (
+        (randomInt(max + 1 - min) + min * random()) as String {format: "#.00"} as Number
+    )
+    
+/*
+ * Assigns random ticket prices for each flight in the payload
+ */
+fun assignRandomPrice(payload) =
+using(object = payload)
+(
+  object ++ {ticketPrice: createRandomPrice() }
+)
+
+
+
+---
+using(errorString = "The fight pricing service is offline. Try again later.")
+(
+payload ++ {ticketPrice: "The flight pricing service is offline. Try again later."}
+	
+)
+
+
+
+
+
+]]></ee:set-payload>
+                            </ee:message>
+                            <ee:variables>
+                                <ee:set-variable variableName="pricingErrors"><![CDATA[%dw 2.0
+output application/java
+---
+true
+]]></ee:set-variable>
+                            </ee:variables>
+                        </ee:transform>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+            <ee:transform doc:name="Add processed Flight to processedFlights var" doc:id="ac783f63-a50c-44ab-88de-e4a057da6e55">
+                <ee:message/>
+                <ee:variables>
+                    <ee:set-variable variableName="processedFlights"><![CDATA[%dw 2.0
+output application/json
+---
+
+
+vars.errors match {
+	case is Null ->
+		payload match {
+		case is Object -> vars.processedFlights + payload
+		case is Array -> vars.ProcessedFlights ++ payload
+		else -> vars.processedFlights
+	}
+	else -> vars.errors
+
+}
+
+]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+            <ee:transform doc:name="Update totalPrice" doc:id="6ecb0306-8451-4fc0-b3b1-f3a05ac3d884">
+                <ee:message/>
+                <ee:variables>
+                    <ee:set-variable variableName="totalPrice"><![CDATA[%dw 2.0
+output application/java
+---
+(vars.totalPrice as Number) + (payload.ticketPrice as Number)]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+            <logger level="INFO" doc:name="Logger" doc:id="b5b6b6ca-926d-4054-8e91-7f7b1af19cb1" message="#[vars.processedFlights]"/>
+        </foreach>
+        <ee:transform doc:name="Set payload to search results JSON" doc:id="481138e1-1c33-401b-9866-89bcdd848692">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var charLookup = ['A','B','C','D','E','F','G']
+
+/*
+ * Creates a random seat
+ * returns a String
+ */
+fun createRandomSeat() = 
+    using (seatNumber = mod(randomInt(100), 50) + 1)
+    using (seatLetter = charLookup[ mod(randomInt(100),7) as Number ])
+    seatNumber as String ++ seatLetter
+
+/*
+ * Creates a random price
+ * returns a currency type
+ */
+fun createRandomPrice() = 
+    using (max = 2689)
+    using (min = 365)
+    (
+        (randomInt(max + 1 - min) + min * random()) as String {format: "#.00"} as Number
+    )
+
+/*
+ * Filters flights with given origin and destination
+ */
+fun getFlights(payload, origin, destination) = 
+    payload filter ($.origin == origin and $.destination == destination)
+
+/*
+ * Assigns random seats for each given flight
+ */
+fun assignSeats(payload) = 
+    payload map ((object) ->
+        
+        if (object.flightNumber[-1] == '2')
+            object ++ {seatInfo: createRandomSeat() }
+        else if (object.flightNumber[-1] == '3')
+            //Can raise assertion here and catch it in an Error Handler if we want
+        	object ++ {error: 'flight not available!'}
+        else
+            object ++ {seatInfo: "No seat info available"}
+    )
+
+/*
+ * Assigns random ticket prices for each flight in the payload
+ */
+fun assignRandomPrice(payload) =
+    (
+        payload map ((object) ->
+            object ++ {ticketPrice: createRandomPrice() }
+        )
+    )
+---
+using (out = vars.processedFlights)
+using (flightErrors = out filter ($.error == "flight not available!"))
+(
+	
+if (vars.seatingErrors) (
+ 	if(vars.pricingErrors)
+   flights: {
+        errors: '<strong> Seating and Pricing service errors</strong><BR>{"route-flight-error" : "Both the seating and pricing services are offline. Check your internet connection or try again later."}'        
+    }
+    else
+       flights: {
+        errors: '<strong> Seating service errors</strong><BR>{"route-flight-error" : "The seating service is offline. Check your internet connection or try again later."}'        
+    }
+    
+)
+else if (vars.pricingErrors) 
+   flights: {
+        errors: '<strong> Pricing service error</strong><BR>{"route-flight-error" : "The pricing service is offline. Try again later."}'        
+  
+  
+  }
+    
+else if (isEmpty(out))
+    flights: {
+        errors: '<strong>Error processing request </strong> {"route-flight-error" : "Invalid Request - No route from ' ++ vars.origin  ++ ' to ' ++ vars.destination ++ ' could be found."'        
+    }
+else if (not isEmpty(flightErrors))
+	flights: {
+		errors: "There was a problem with your search: Flight " ++ flightErrors[0].flightNumber ++ " is not available."
+	}
+else
+    { flights: out,
+    	totalPrice: vars.totalPrice default null
+    	
+    }
+)
+
+
+
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <try doc:name="Try" doc:id="6d2fafd2-01f3-4cb7-a086-164ecbcf2df4">
+            <http:request method="POST" doc:name="POST pnr information" doc:id="f657b970-e362-4941-9744-e496fc843fbb" config-ref="HTTP_Request_configuration" path="${reservations.sabre.baseuri}" responseTimeout="${reservations.sabre.response.timeout}"/>
+            <error-handler>
+                <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="29613617-d532-411a-82e4-bef9a718a6fa">
+                    <ee:transform doc:name="Transform Message" doc:id="a68f5c2a-d732-4fa3-990c-808e4f886f24">
+                        <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+	flights: {
+		errors: "<strong>Error requesting a PNR for this reservation from the SABRE system</strong>.
+		<BR> Either try again later or modify the request connection timeout in the Mule application."
+	}]]></ee:set-payload>
+                        </ee:message>
+                    </ee:transform>
+                </on-error-continue>
+            </error-handler>
+        </try>
+        <logger level="INFO" doc:name="Logger" doc:id="7869a725-a52b-4864-a841-9f26af1d4e5e"/>
+    </flow>
+    <flow name="acquireSeatsInfo" doc:id="2a4ee255-9186-49a1-a79a-44397141d061" initialState="started">
+        <ee:transform doc:name="Simulate business conditions for seat selection" doc:id="1a365dc2-972a-4917-b964-c8c13e44db36">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var charLookup = ['A','B','C','D','E','F','G']
+
+/*
+ * Creates a random seat
+ * returns a String
+ */
+fun createRandomSeat() = 
+    using (seatNumber = mod(randomInt(100), 50) + 1)
+    using (seatLetter = charLookup[ mod(randomInt(100),7) as Number ])
+    seatNumber as String ++ seatLetter
+
+/*
+ * Creates a random price
+ * returns a currency type
+ */
+fun createRandomPrice() = 
+    using (max = 2689)
+    using (min = 365)
+    (
+        (randomInt(max + 1 - min) + min * random()) as String {format: "#.00"} as Number
+    )
+
+/*
+ * Filters flights with given origin and destination
+ */
+fun getFlights(payload, origin, destination) = 
+    payload filter ($.origin == origin and $.destination == destination)
+
+/*
+ * Assigns random seats for each given flight
+ */
+fun assignSeat(payload) = 
+using(object = payload)
+(        
+        if (object.flightNumber[-1] == '2')
+            object ++ {seatInfo: createRandomSeat() }
+        else if (object.flightNumber[-1] == '3')
+            //Can raise assertion here and catch it in an Error Handler if we want
+        	object ++ {error: 'flight not available!'}
+        else
+            object ++ {seatInfo: "No seat info available"}
+)
+
+/*
+ * Assigns random ticket prices for each flight in the payload
+ */
+fun assignRandomPrice(payload) =
+    (
+        payload map ((object) ->
+            object ++ {ticketPrice: createRandomPrice() }
+        )
+    )
+---
+assignSeat(
+	payload
+)
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="ce67d9be-9037-4f0e-80e6-f1c31fe5f940"/>
+    </flow>
+    <flow name="acquireFlightPrice" doc:id="567f5422-a4b9-44df-adaf-a1151e52e6f8" initialState="started">
+        <ee:transform doc:name="Assign random price to flight" doc:id="b9ffa730-8000-4d57-8fa9-4c274dfdeb97">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+var charLookup = ['A','B','C','D','E','F','G']
+
+
+/*
+ * Creates a random price
+ * returns a currency type
+ */
+fun createRandomPrice() = 
+    using (max = 2689)
+    using (min = 365)
+    (
+        (randomInt(max + 1 - min) + min * random()) as String {format: "#.00"} as Number
+    )
+    
+/*
+ * Assigns random ticket prices for each flight in the payload
+ */
+fun assignRandomPrice(payload) =
+using(object = payload)
+(
+  object ++ {ticketPrice: createRandomPrice() }
+)
+
+
+
+---
+assignRandomPrice(payload)
+
+
+
+
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="c54bd4a2-dabf-4942-a622-cc21829fa4b7"/>
+    </flow>
+    <flow name="mockPnrSystem" doc:id="110e95aa-8684-4f52-9963-65a39c9ea791">
+        <http:listener doc:name="Listener" doc:id="f13c1efb-64b9-4b15-82c1-e321a7637f67" config-ref="HTTP_Listener_config" path="${reservations.sabre.baseuri}" allowedMethods="POST">
+            <http:response>
+                <http:headers><![CDATA[#[output applicaton/java
+---
+{
+	"content-type" : "application/json"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <ee:transform doc:name="Generate random PNR" doc:id="dd2b8f30-de0a-4551-971a-9267e83a8f76">
+            <ee:message/>
+            <ee:variables>
+                <ee:set-variable variableName="pnr"><![CDATA[%dw 2.0
+output application/java
+
+var abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+
+---
+(0 to 5) reduce ( (count, acc="") ->
+	acc ++ (abc[randomInt(35)] as String)
+)]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform doc:name="Add pnr to payload" doc:id="3723cf40-02c9-4bbc-b7fc-76e601e3cc44">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+
+output application/json
+---
+using(sortedFlights = payload.flights orderBy $.ticketPrice)
+(
+	payload mapObject ( (value, key) ->
+		key match {
+			case "flights" -> {
+				pnr: vars.pnr as String,
+				flights: sortedFlights
+			}
+			else -> {(key): value}
+		}
+
+	)
+)  dw::Runtime::wait(2000)]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

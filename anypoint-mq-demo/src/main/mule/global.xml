@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+  http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+  <anypoint-mq:config name="anypointMQConfig" doc:name="Anypoint MQ Config" doc:id="b1cf73fe-08ca-425b-b9df-88b8db0e99a4">
+    <anypoint-mq:connection clientId="${mq.clientId}"
+      clientSecret="${mq.clientSecret}" url="${mq.url}"/>
+  </anypoint-mq:config>
+  <configuration-properties doc:name="Configuration properties" doc:id="a6d7319a-519b-482c-a586-92e128bce725" file="dev-config.yaml" />
+
+</mule>

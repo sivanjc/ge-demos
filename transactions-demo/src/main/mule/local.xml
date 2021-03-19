@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+  <db:config name="dbConnection" doc:name="Database Config" doc:id="4bad1f1d-dcbe-4dad-ac6d-c3c660bf78f5" >
+    <db:data-source-connection />
+  </db:config>
+  <flow name="localFlow" doc:id="257339bc-4a1a-44a4-a511-fd5f146a2df7" >
+    <db:listener doc:name="On Table Row" doc:id="7293886a-b31f-41fe-a3bb-3fd7fbf99c3c" transactionalAction="ALWAYS_BEGIN" config-ref="dbConnection">
+      <scheduling-strategy >
+        <fixed-frequency />
+      </scheduling-strategy>
+    </db:listener>
+    <db:insert doc:name="Insert to Table A" doc:id="eed04378-af9a-4a25-8b9c-623e596213c7" />
+    <db:insert doc:name="Insert to Table B" doc:id="2be07aa6-6000-434d-9104-a26e272cff64" />
+    <raise-error doc:name="Raise error" doc:id="979bddc9-1586-4dcf-bcb1-179cf998be8c" />
+    <db:insert doc:name="Insert into Table C" doc:id="d2ae71eb-e28e-4bc4-8b89-606cb836f8f5" />
+    <error-handler >
+      <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5390f20f-8fbd-4e4c-9e70-d0a89793fe4c" >
+        <logger level="INFO" doc:name="Complete Rollback" doc:id="044e13d9-3a39-4b11-8290-baeb8214f02a" />
+      </on-error-propagate>
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d43158d2-eef8-4d9b-934e-5117f2c07e0f" >
+        <logger level="INFO" doc:name="Partial COmmit" doc:id="a03bf10e-a82f-4964-aee9-8b067db8b736" />
+      </on-error-continue>
+    </error-handler>
+  </flow>
+  <flow name="local-transaction" doc:id="99f8e553-c54b-4de7-8645-c4a6263eb821" >
+    <http:listener doc:name="Listener" doc:id="eeff9957-4f98-4319-b0ea-005c0d754532" />
+    <logger level="INFO" doc:name="Logger" doc:id="c0e9222c-1e31-47b3-a656-c996cb143150" />
+    <try doc:name="Try" doc:id="cdf0efa8-8fb8-4c4d-9e26-ceb0aeb1c379" transactionalAction="ALWAYS_BEGIN">
+      <db:insert doc:name="Insert to Table A" doc:id="32b8f06e-a07e-430f-83ff-4e6ef4f4f979" />
+      <db:insert doc:name="Insert to Table B" doc:id="0a06129e-6dd0-40e7-bd34-4b9299bcb78c" />
+      <db:insert doc:name="Insert into Table C" doc:id="ada359b1-2b48-405a-ad57-f1cede0594fd" />
+      <error-handler >
+        <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="591fff2a-6268-40f5-9c95-30fd1392e314">
+        <logger level="INFO" doc:name="Complete Rollback" doc:id="80958e8a-0b84-4465-a9b5-bd092ab0ef60" />
+      </on-error-propagate>
+        <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2cd993f5-9b14-4964-a1ac-f90b5603b145">
+        <logger level="INFO" doc:name="Partial COmmit" doc:id="121b2573-0989-4d15-8217-b7b25366c92a" />
+      </on-error-continue>
+      </error-handler>
+    </try>
+    <raise-error doc:name="Raise error" doc:id="06043140-c8e0-4b67-b828-56a5f6e204a3" />
+  </flow>
+</mule>

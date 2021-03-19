@@ -1,0 +1,6 @@
+cloudhub:
+  username: "siva_training_033"
+  password: "Test12345"
+  env: "Sandbox"
+  url: "https://anypoint.mulesoft.com"
+  appname: "replaceThisWithYourAppName"

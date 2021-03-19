@@ -1,0 +1,89 @@
+#%RAML 1.0
+title: Order API
+version: v2
+
+types:
+  LineItems: !include datatypes/LineItemDataType.raml
+
+  Items:
+    type: LineItems[]
+
+  Order:
+    properties:
+      oid:
+        type: string
+      account-id:
+        type: string
+      items:
+        type: Items
+      order-date:
+        type: datetime
+      status:
+        type: string
+      total-price?:
+        type: number
+        format: float
+      total-tax?:
+        type: number
+        format: float
+
+  Orders:
+    type: Order[]
+
+/orders2:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Orders
+            examples:
+              output1: !include examples/OrdersExample.raml
+
+      400:
+        body:
+          application/json:
+            example:
+              "Error" : "Bad Request"
+  post:
+    body:
+      application/json:
+        type: Order
+        examples:
+          input: !include examples/OrderExample.raml
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+              "Message" : "Order Created" 
+    
+  /{oid}:
+    put:
+      body:
+        application/json:
+          type: Order
+          examples:
+            input: !include examples/OrderExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                "Message" : "Order Updated"
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                "Message" : "Order Deleted"
+
+
+
+
+
+      
+
+  

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) MuleSoft, Inc. All rights reserved. http://www.mulesoft.com
+  
+  The software in this package is published under the terms of the
+  Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License,
+  a copy of which has been included with this distribution in the LICENSE.txt file.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.mulesoft.training.mcial1</groupId>
+    <artifactId>standalone-apps-modules-pom</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>template-app</module>
+        <module>demo-app</module>
+        <module>hello-world</module>
+        <module>dataweave-playground</module>
+        <module>excercise4-3-solution</module>
+        <module>excercise4-2-solution</module>
+        <module>excercise5-1-solution</module>
+        <module>message-routers-scopes</module>
+        <module>mod05-app</module>
+        <module>threadtest4.3.0_schedulerPool</module>
+        <module>threadtest4.3.0</module>
+        <module>mod03-apikit</module>
+        <module>weather-api-client</module>
+        <module>testing-playground</module>
+        <module>flight-reservations</module>
+        <module>flight-reservations-ext-props</module>
+        <module>price-lookup-service</module>
+        <module>price-lookup-service-custom-metric</module>
+        <module>os-data-sharing-multiplenodes</module>
+        <module>vm-message-sharing-multiplenodes</module>
+        <module>state-examples-with-config</module>
+        <module>exercise8-2-solution</module>
+        <module>idempotent-message-validator</module>
+        <module>excercise10-1-solution</module>
+        <module>excercise11-1</module>
+        <module>excercise11-1-solution</module>
+        <module>excercise12-1</module>
+        <module>excercise13-1</module>
+        <module>excercise13-1-solution</module>
+        <module>excercise14-2-solution</module>
+        <module>excercise14-3-solution</module>
+        <module>excercise14-4</module>
+        <module>excercise14-4-solution</module>
+        <module>excercise15-2</module>
+        <module>excercise15-3</module>
+    </modules>
+</project>
